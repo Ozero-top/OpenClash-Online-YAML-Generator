@@ -1,69 +1,5 @@
 ![image](https://raw.githubusercontent.com/Ozero-top/OpenClash-Online-YAML-Generator/e186374986f00f39fe8ed7b5cb2a654bb2a12c62/Interface%20Preview.png)
 # OpenClash 配置文件 YAML在线生成器
-## 详细技术说明
-
-### 1. 系统与代码架构
-
-该 JS 文件采用了 **Cloudflare Worker 无服务器架构（Serverless）+ 嵌入式单页 Web 界面（Single-File SPA）** 的轻量化全栈设计：
-
-* **服务端（Server-Side）**：基于 ES Module 规范导出 `default.fetch` 入口。当接收到 HTTP 请求时，构造并返回一个包含完整 HTML、CSS 与 JavaScript Client 代码的响应体，实现无状态的纯前端页面交付。
-* **客户端（Client-Side）**：纯原生 JavaScript（Vanilla JS），不依赖任何前端框架。通过 DOM 操作响应交互、管理状态，并在客户端本地完成协议解析、地区识别、YAML 模板渲染与文件导出。
-
-### 2. 核心依赖与外部服务
-
-* **Cloudflare Worker Runtime**：提供 Edge 节点上的无服务器托管与 HTTP 响应处理。
-* **Cloudflare DoH (`[https://1.1.1.1/dns-query](https://1.1.1.1/dns-query)`)**：通过 DNS-over-HTTPS（JSON 格式）将输入的域名节点解析为 IPv4 地址，规避客户端本地 DNS 污染或解析限制。
-* **IP-API (`[https://ip-api.com/json/](https://ip-api.com/json/)...`)**：用于查询 IPv4 地址的国家/地区代码（Country Code），实现自动节点地理位置识别。
-* **Fastly / jsDelivr CDN**：在生成的 Clash 配置文件中，引用了部署在 GitHub/CDN 上的 Mihomo 规则集文件（`.mrs` / `.list` 格式）。
-* **File System Access API (`showSaveFilePicker`)**：现代浏览器文件保存 API，在不支持的浏览器中自动降级为 Blob URL 创建与 HTML5 `a[download]` 隐式触发下载。
-
-### 3. 关键算法与逻辑实现
-
-#### (1) 多协议解析引擎（Protocol Parsers）
-
-代码实现了对主流代理协议链接的正则拆解与参数解析：
-
-* **VLESS / Trojan / Hysteria2 / Socks5**：利用标准 `URL` 及 `URLSearchParams` 对象提取 `hostname`、`port`、`username`、`password` 以及 URL Query 参数（如 `security`, `sni`, `pbk`, `sid`, `fp`, `type`, `obfs` 等），构造符合 Clash Meta (Mihomo) 规范的 Proxy JSON 对象。
-* **VMess**：提取 `vmess://` 后续的 Base64 字符串，通过自定义算法解码（兼容 URL-Safe Base64 并做补位处理，再通过 `decodeURIComponent` 转换 UTF-8 字节流），将其转化为 JSON 对象后映射为 Clash VMess 配置。
-
-#### (2) 多阶节点地区识别算法（Geo Detection）
-
-节点国家/地区识别采用**三层递进回退机制**：
-
-1. **文本特征匹配**：使用正则 `detectCountryFromText` 在链接原文/备注中匹配中英文国家名、城市名或国旗 Emoji（如 `🇭🇰`, `US`, `东京`）。
-2. **DoH 域名解析 + IP 地理查询**：若正则匹配失败，提取节点的主机名 `extractHostFromLink`；若为域名，调用 Cloudflare DoH 异步解析出 IPv4，再请求 `IP-API` 获取 `countryCode` 并映射为中文名称。
-3. **兜底策略**：若网络请求超时或无匹配项，归类为“通用”。
-
-#### (3) 动态 YAML 配置组装与内联转换
-
-* **`formatInlineYaml` 算法**：将 JS 节点对象转换为 Clash 要求的内联 YAML 格式字符串（例如 `{name: "节点", type: "socks5", server: "1.1.1.1", ...}`）。
-* **链式代理逻辑（Chain Proxy / Dialer-Proxy）**：为住宅 IP 落地节点注入 `dialer-proxy` 属性，将其前置中转流量指定给机场订阅策略组（如 `所有-自动` 或 `所有-手动`），并动态生成 `SRC-IP-CIDR` 分流规则与独立的策略组。
-
-### 4. 数据流向与模块调用
-
-```
-[用户输入节点/订阅] ──> [DOM 事件响应 (oninput / onclick)]
-                               │
-                               ▼
-                    [协议解析 / 字符串切分]
-                               │
-                               ▼
-               [地区识别 (正则匹配 ──> DoH ──> IP-API)]
-                               │
-                               ▼
-                   [构造 Proxy / Group 对象]
-                               │
-                               ▼
-            [生成 YAML 文本 (模板拼接 + 内联转换)]
-                               │
-     ┌─────────────────────────┴─────────────────────────┐
-     ▼                                                   ▼
-[DOM 预览区渲染 (#out-full)]                 [浏览器下载 (SavePicker/Blob)]
-
-```
-
----
-
 ## 功能说明
 
 ### 1. 核心功能模块
@@ -170,3 +106,67 @@
 
 * **原因**：`dialer-proxy` 指向的前置节点组无可用节点，或前置节点与落地 SOCKS5/节点之间的链路不通。
 * **解决办法**：在 Clash Web 控制面板（如 ZashBoard / Yacd）中，检查并确保前置策略组（如 `所有-手动`）中已选中延迟正常的有效节点。
+
+## 详细技术说明
+
+### 1. 系统与代码架构
+
+该 JS 文件采用了 **Cloudflare Worker 无服务器架构（Serverless）+ 嵌入式单页 Web 界面（Single-File SPA）** 的轻量化全栈设计：
+
+* **服务端（Server-Side）**：基于 ES Module 规范导出 `default.fetch` 入口。当接收到 HTTP 请求时，构造并返回一个包含完整 HTML、CSS 与 JavaScript Client 代码的响应体，实现无状态的纯前端页面交付。
+* **客户端（Client-Side）**：纯原生 JavaScript（Vanilla JS），不依赖任何前端框架。通过 DOM 操作响应交互、管理状态，并在客户端本地完成协议解析、地区识别、YAML 模板渲染与文件导出。
+
+### 2. 核心依赖与外部服务
+
+* **Cloudflare Worker Runtime**：提供 Edge 节点上的无服务器托管与 HTTP 响应处理。
+* **Cloudflare DoH (`[https://1.1.1.1/dns-query](https://1.1.1.1/dns-query)`)**：通过 DNS-over-HTTPS（JSON 格式）将输入的域名节点解析为 IPv4 地址，规避客户端本地 DNS 污染或解析限制。
+* **IP-API (`[https://ip-api.com/json/](https://ip-api.com/json/)...`)**：用于查询 IPv4 地址的国家/地区代码（Country Code），实现自动节点地理位置识别。
+* **Fastly / jsDelivr CDN**：在生成的 Clash 配置文件中，引用了部署在 GitHub/CDN 上的 Mihomo 规则集文件（`.mrs` / `.list` 格式）。
+* **File System Access API (`showSaveFilePicker`)**：现代浏览器文件保存 API，在不支持的浏览器中自动降级为 Blob URL 创建与 HTML5 `a[download]` 隐式触发下载。
+
+### 3. 关键算法与逻辑实现
+
+#### (1) 多协议解析引擎（Protocol Parsers）
+
+代码实现了对主流代理协议链接的正则拆解与参数解析：
+
+* **VLESS / Trojan / Hysteria2 / Socks5**：利用标准 `URL` 及 `URLSearchParams` 对象提取 `hostname`、`port`、`username`、`password` 以及 URL Query 参数（如 `security`, `sni`, `pbk`, `sid`, `fp`, `type`, `obfs` 等），构造符合 Clash Meta (Mihomo) 规范的 Proxy JSON 对象。
+* **VMess**：提取 `vmess://` 后续的 Base64 字符串，通过自定义算法解码（兼容 URL-Safe Base64 并做补位处理，再通过 `decodeURIComponent` 转换 UTF-8 字节流），将其转化为 JSON 对象后映射为 Clash VMess 配置。
+
+#### (2) 多阶节点地区识别算法（Geo Detection）
+
+节点国家/地区识别采用**三层递进回退机制**：
+
+1. **文本特征匹配**：使用正则 `detectCountryFromText` 在链接原文/备注中匹配中英文国家名、城市名或国旗 Emoji（如 `🇭🇰`, `US`, `东京`）。
+2. **DoH 域名解析 + IP 地理查询**：若正则匹配失败，提取节点的主机名 `extractHostFromLink`；若为域名，调用 Cloudflare DoH 异步解析出 IPv4，再请求 `IP-API` 获取 `countryCode` 并映射为中文名称。
+3. **兜底策略**：若网络请求超时或无匹配项，归类为“通用”。
+
+#### (3) 动态 YAML 配置组装与内联转换
+
+* **`formatInlineYaml` 算法**：将 JS 节点对象转换为 Clash 要求的内联 YAML 格式字符串（例如 `{name: "节点", type: "socks5", server: "1.1.1.1", ...}`）。
+* **链式代理逻辑（Chain Proxy / Dialer-Proxy）**：为住宅 IP 落地节点注入 `dialer-proxy` 属性，将其前置中转流量指定给机场订阅策略组（如 `所有-自动` 或 `所有-手动`），并动态生成 `SRC-IP-CIDR` 分流规则与独立的策略组。
+
+### 4. 数据流向与模块调用
+
+```
+[用户输入节点/订阅] ──> [DOM 事件响应 (oninput / onclick)]
+                               │
+                               ▼
+                    [协议解析 / 字符串切分]
+                               │
+                               ▼
+               [地区识别 (正则匹配 ──> DoH ──> IP-API)]
+                               │
+                               ▼
+                   [构造 Proxy / Group 对象]
+                               │
+                               ▼
+            [生成 YAML 文本 (模板拼接 + 内联转换)]
+                               │
+     ┌─────────────────────────┴─────────────────────────┐
+     ▼                                                   ▼
+[DOM 预览区渲染 (#out-full)]                 [浏览器下载 (SavePicker/Blob)]
+
+```
+
+---  
