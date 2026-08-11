@@ -1,3 +1,4 @@
+![image]([https://github.com/lexsaints/powershell/blob/master/IMG/ps2.png](https://github.com/Ozero-top/OpenClash-Online-YAML-Generator/blob/e186374986f00f39fe8ed7b5cb2a654bb2a12c62/Interface%20Preview.png))
 # OpenClash 配置文件 YAML在线生成器
 ## 详细技术说明
 
