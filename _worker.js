@@ -6,7 +6,7 @@ export default {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Clash 配置文件一键生成器 </title>
+    <title> Clash Yaml配置文件一键生成器 </title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif; padding: 20px; background-color: #f0f2f5; color: #333; }
         .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
@@ -62,7 +62,7 @@ export default {
 
 <div class="container">
     <div class="header-title-container">
-        <h2>⚡ Clash 配置文件一键生成器</h2>
+        <h2>⚡ Clash Yaml配置文件一键生成器</h2>
         <div class="header-right-tools">
             <a href="https://github.com/Ozero-top/OpenClash-Online-YAML-Generator" target="_blank" rel="noopener noreferrer" class="github-link" title="访问 GitHub 开源项目">
                 <svg height="24" width="24" viewBox="0 0 16 16" fill="currentColor">
