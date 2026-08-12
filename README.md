@@ -60,8 +60,8 @@
 1. 选择 **🌐 自动分流 - 家用模式**。
 2. 输入主力机场订阅地址；若有备用机场，勾选 **启用备用代理聚合** 并填入备用订阅地址。
 3. 点击 **🚀 生成并自动下载完整 YAML 文件**。
-4. clash运行该yaml文件后，可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组，根据使用需求自行设置；
-5. 分流/防泄漏前提要自行配置clash插件 或 替换clash插件配置文件，具体操作可参考：[使用指南](https://github.com/Ozero-top/OpenClash-Config/blob/main/README.md) - 【替换OpenClash插件配置文件】 操作说明
+4. clash运行该yaml文件后，可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组，根据使用需求自行设置；除 直连、拒绝 策略组，其他策略组均是自动切换最低延时节点；可手动选择，但会在3-6小时后自动切换到延时最低节点
+5. 分流/防泄漏前提要自行配置clash插件 或 替换clash插件配置文件，具体操作可参考：[使用指南](https://github.com/Ozero-top/OpenClash-Config/blob/main/README.md) - 【替换OpenClash插件配置文件】 操作说明 
 
 #### 场景 C：Socks5 / SK 格式转换
 1. 选择 **🛠️ Socks5 / SK 格式转换** 模式。
