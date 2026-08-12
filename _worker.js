@@ -1,4 +1,3 @@
-// Cloudflare Worker 部署入口
 export default {
   async fetch(request, env, ctx) {
     const html = `<!DOCTYPE html>
@@ -62,7 +61,7 @@ export default {
 
 <div class="container">
     <div class="header-title-container">
-        <h2>⚡ Clash Yaml配置文件一键生成器</h2>
+        <h2>⚡ Clash Yaml配置文件一键生成工具</h2>
         <div class="header-right-tools">
             <a href="https://github.com/Ozero-top/OpenClash-Online-YAML-Generator" target="_blank" rel="noopener noreferrer" class="github-link" title="访问 GitHub 开源项目">
                 <svg height="24" width="24" viewBox="0 0 16 16" fill="currentColor">
@@ -86,8 +85,8 @@ export default {
         <div class="section-title">1. 前置中转代理订阅配置</div>
         <div class="row">
             <div style="flex: 1;">
-                <label for="chainSubName">主力机场自定义名称:</label>
-                <input type="text" id="chainSubName" value="主力机场" placeholder="自定义名称（默认：主力机场）">
+                <label for="chainSubName">代理服务商自定义名称:</label>
+                <input type="text" id="chainSubName" value="服务商名称" placeholder="自定义名称（默认：服务商名称）">
             </div>
             <div style="flex: 2;">
                 <label for="subUrl">主力中转代理订阅地址 (url):</label>
@@ -155,8 +154,8 @@ export default {
         <div class="section-title">🌐 自动分流代理订阅配置 </div>
         <div class="row">
             <div style="flex: 1;">
-                <label for="stdSubName1">主力机场自定义名称:</label>
-                <input type="text" id="stdSubName1" value="主力机场" placeholder="自定义名称（默认：主力机场）">
+                <label for="stdSubName1">代理服务商自定义名称:</label>
+                <input type="text" id="stdSubName1" value="服务商名称" placeholder="自定义名称（默认：服务商名称）">
             </div>
             <div style="flex: 2;">
                 <label for="stdSubUrl1">主力代理订阅地址 (url):</label>
@@ -172,8 +171,8 @@ export default {
         </div>
         <div class="row" id="backupSubRow" style="display: none; margin-top: 8px;">
             <div style="flex: 1;">
-                <label for="stdSubName2">备用机场自定义名称:</label>
-                <input type="text" id="stdSubName2" value="备用机场" placeholder="自定义名称（默认：备用机场）">
+                <label for="stdSubName2">备用服务商自定义名称:</label>
+                <input type="text" id="stdSubName2" value="备用服务商" placeholder="自定义名称（默认：备用服务商）">
             </div>
             <div style="flex: 2;">
                 <label for="stdSubUrl2">备用代理订阅地址 (url):</label>
@@ -720,10 +719,10 @@ async function generateYaml(autoDownload = false) {
     statusMsg.innerText = "⏳ 正在生成配置文件，请稍等...";
 
     if (currentMode === 'standard') {
-        const subName1 = document.getElementById('stdSubName1').value.trim() || '主力机场';
+        const subName1 = document.getElementById('stdSubName1').value.trim() || '服务商名称';
         const subUrl1 = document.getElementById('stdSubUrl1').value.trim() || 'https://your-main-sub-domain.com/link/token';
         const enableBackup = document.getElementById('enableBackupSub').checked;
-        const subName2 = document.getElementById('stdSubName2').value.trim() || '备用机场';
+        const subName2 = document.getElementById('stdSubName2').value.trim() || '备用服务商';
         const subUrl2 = document.getElementById('stdSubUrl2').value.trim() || 'https://your-backup-sub-domain.com/link/token';
 
         let proxyProvidersBlock = \`  \${subName1}:
