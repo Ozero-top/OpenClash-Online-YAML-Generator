@@ -1,3 +1,4 @@
+// Cloudflare Worker 部署入口
 export default {
   async fetch(request, env, ctx) {
     const html = `<!DOCTYPE html>
@@ -10,14 +11,17 @@ export default {
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif; padding: 20px; background-color: #f0f2f5; color: #333; }
         .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
         
-        /* 标题与顶部工具栏横向并列样式 */
         .header-title-container { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e8eaed; padding-bottom: 10px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
         .header-title-container h2 { margin: 0; color: #1a73e8; font-size: 20px; border-bottom: none; padding-bottom: 0; }
         .header-right-tools { display: flex; align-items: center; gap: 12px; }
         .github-link { color: #333; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; transition: color 0.2s; }
         .github-link:hover { color: #1a73e8; }
         
-        .section-title { font-weight: bold; font-size: 15px; color: #1a73e8; margin-top: 20px; margin-bottom: 8px; border-left: 4px solid #1a73e8; padding-left: 8px; }
+        .section-header-box { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
+        .section-title { font-weight: bold; font-size: 15px; color: #1a73e8; border-left: 4px solid #1a73e8; padding-left: 8px; margin: 0; }
+        .ext-link-download { font-size: 13px; color: #1a73e8; font-weight: 600; text-decoration: none; transition: color 0.2s; display: inline-flex; align-items: center; gap: 4px; }
+        .ext-link-download:hover { color: #1557b0; text-decoration: underline; }
+
         label { font-weight: 600; display: block; margin-top: 10px; margin-bottom: 4px; font-size: 13px; color: #444; }
         textarea, input[type="text"], input[type="number"], select { width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #dadce0; border-radius: 6px; font-family: inherit; font-size: 13px; }
         textarea:focus, input:focus, select:focus { border-color: #1a73e8; outline: none; }
@@ -30,6 +34,8 @@ export default {
         .mode-btn:hover:not(.active) { background: #e8f0fe; }
 
         .mode-desc-box { background: #f8f9fa; border: 1px solid #d2e3fc; border-radius: 8px; padding: 12px 15px; margin-bottom: 20px; color: #174ea6; font-size: 13px; line-height: 1.6; }
+        .mode-desc-box a { color: #1a73e8; text-decoration: underline; font-weight: bold; }
+        .mode-desc-box a:hover { color: #1557b0; }
 
         .btn-group { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
         .btn-main { flex: 2; min-width: 180px; padding: 12px; background-color: #1a73e8; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: bold; transition: background 0.2s; }
@@ -71,7 +77,13 @@ export default {
         </div>
     </div>
 
-    <div class="section-title">生成模式与实用工具选择</div>
+    <div class="section-header-box">
+        <div class="section-title">生成模式与实用工具选择</div>
+        <a href="https://github.com/Ozero-top/OpenClash-Config/tree/main/OpenClash%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6" target="_blank" rel="noopener noreferrer" class="ext-link-download">
+            📥 OpenClash插件配置文件下载
+        </a>
+    </div>
+
     <div class="mode-btn-group">
         <button id="btn-mode-chain-single" class="mode-btn active" onclick="switchMode('chain-single')">🔲 链式代理 - 独立节点</button>
         <button id="btn-mode-chain-bulk" class="mode-btn" onclick="switchMode('chain-bulk')">📑 链式代理 - 批量粘贴</button>
@@ -82,7 +94,9 @@ export default {
     <div id="modeDescBox" class="mode-desc-box"></div>
     
     <div id="chainConfigSection">
-        <div class="section-title">1. 前置中转代理订阅配置</div>
+        <div class="section-header-box">
+            <div class="section-title">1. 前置中转代理订阅配置</div>
+        </div>
         <div class="row">
             <div style="flex: 1;">
                 <label for="chainSubName">代理服务商自定义名称:</label>
@@ -94,7 +108,9 @@ export default {
             </div>
         </div>
 
-        <div class="section-title">2. 前置中转与规则匹配方式</div>
+        <div class="section-header-box">
+            <div class="section-title">2. 前置中转与规则匹配方式</div>
+        </div>
         <div class="row" style="margin-bottom: 10px;">
             <div>
                 <label for="ruleTargetType">匹配模式 / 分流对象范围:</label>
@@ -133,7 +149,9 @@ export default {
             </div>
         </div>
 
-        <div class="section-title">3. 节点配置</div>
+        <div class="section-header-box">
+            <div class="section-title">3. 节点配置</div>
+        </div>
         
         <div id="singleContainer" class="mode-section active-section">
             <div id="nodesContainer"></div>
@@ -151,7 +169,9 @@ export default {
     </div>
 
     <div id="standardConfigSection" class="mode-section">
-        <div class="section-title">🌐 自动分流代理订阅配置 </div>
+        <div class="section-header-box">
+            <div class="section-title">🌐 自动分流代理订阅配置 </div>
+        </div>
         <div class="row">
             <div style="flex: 1;">
                 <label for="stdSubName1">代理服务商自定义名称:</label>
@@ -182,7 +202,9 @@ export default {
     </div>
 
     <div id="skConvertSection" class="mode-section">
-        <div class="section-title">🛠️ IP|端口|账号|密码 批量转 Socks5 链接</div>
+        <div class="section-header-box">
+            <div class="section-title">🛠️ IP|端口|账号|密码 批量转 Socks5 链接</div>
+        </div>
         <div style="margin-bottom: 12px;">
             <label for="skInputData">输入原始数据（格式：IP|端口|账号|密码 或 域名|端口|账号|密码）：</label>
             <textarea id="skInputData" rows="6" placeholder="示例格式：&#10;sk.admin.com|10002|aaBBcc|12345678abcdefg&#10;192.168.1.100|1080|user1|pass123"></textarea>
@@ -212,7 +234,9 @@ export default {
     <div id="statusMsg" class="status"></div>
 
     <div id="clashOutputSection">
-        <div class="section-title">📄 完整 YAML 预览区</div>
+        <div class="section-header-box">
+            <div class="section-title">📄 完整 YAML 预览区</div>
+        </div>
         <div id="out-full" class="output-box">点击生成按钮后查看...</div>
     </div>
 </div>
@@ -222,10 +246,12 @@ let lastGeneratedYaml = "";
 let nodeCount = 0;
 let currentMode = "chain-single";
 
+const guideLink = '<a href="https://github.com/Ozero-top/OpenClash-Config/blob/main/README.md" target="_blank" rel="noopener noreferrer">使用指南</a>';
+
 const modeDescriptions = {
-    'chain-single': '🔲 链式代理 - 独立节点输入模式：允许用户通过独立的表单卡片逐个输入或粘贴前置中转代理节点，支持为每个节点单独指定或自动识别国家/地区标签，并结合网段或指定单 IP 进行精准分流。&#10;⚠️ 注意：在 Clash 的 [控制面板] 打开 [ZashBoard] 后手动设置 [策略组] 的 [节点] 使用模式，默认使用 [直连] 建议使用 [所有-自动] 模式；[策略组] 设置，只对默认设备起效果，对 [链式代理] 指定IP或者网段无任何影响！',
-    'chain-bulk': '📑 链式代理 - 批量混合粘贴模式：支持在多行文本框中批量粘贴多种协议的节点链接（如 vless、vmess、trojan、hysteria2、socks5），系统会自动解析并批量匹配国家/地区，快速生成链式代理配置文件。&#10;⚠️ 注意：在 Clash 的 [控制面板] 打开 [ZashBoard] 后手动设置 [策略组] 的 [节点] 使用模式，默认使用 [直连] 建议使用 [所有-自动] 模式；[策略组] 设置，只对默认设备起效果，对 [链式代理]指定IP或者网段无任何影响！',
-    'standard': '🌐 自动分流 - 单/双代理订阅家用模式 (V0.2.5)：面向日常或家用场景，支持配置单机场或双机场（主力+备用）订阅地址，自动聚合节点并提供全自动区域流控、延迟优化与丰富的主流分流规则。同时兼顾DNS防泄漏和WebRTC防泄漏。&#10;⚠️ 注意：在 Clash 的 [控制面板] 打开 [ZashBoard] 后手动设置 [策略组] 的 [节点] 使用模式，默认使用 [直连] 建议使用 [所有-自动] 模式！',
+    'chain-single': '🔲 链式代理 - 独立节点输入模式：允许用户通过独立的表单卡片逐个输入或粘贴前置中转代理节点，支持为每个节点单独指定或自动识别国家/地区标签，并结合网段或指定单 IP 进行精准分流。<br>⚠️ clash运行该yaml文件后，无需任何设置即可按照前面 【网段匹配】 或 【指定设备单 IP】配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的【所有 - 手动】选择延时最低节点作为前置中转；其他策略组对 【网段匹配】 或 【指定设备单 IP】 无任何影响；仅作用于 OpenWRT软路由 非 【网段匹配】 或 【指定设备单 IP】 的设备；可自动分流，WebRTC/DNS防泄漏（分流/防泄漏前提要自行配置clash插件 或 本页面右上角下载clash插件配置文件替换，具体操作可参考：[' + guideLink + '] 的操作说明 - 【替换OpenClash插件配置文件】 )',
+    'chain-bulk': '📑 链式代理 - 批量混合粘贴模式：支持在多行文本框中批量粘贴多种协议的节点链接（如 vless、vmess、trojan、hysteria2、socks5），系统会自动解析并批量匹配国家/地区，快速生成链式代理配置文件。<br>⚠️ clash运行该yaml文件后，无需任何设置即可按照前面 【网段匹配】 或 【指定设备单 IP】配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的【所有 - 手动】选择延时最低节点作为前置中转；其他策略组对 【网段匹配】 或 【指定设备单 IP】 无任何影响；仅作用于 OpenWRT软路由 非 【网段匹配】 或 【指定设备单 IP】 的设备；可自动分流，WebRTC/DNS防泄漏（分流/防泄漏前提要自行配置clash插件 或 本页面右上角下载clash插件配置文件替换，具体操作可参考：[' + guideLink + '] 的操作说明 - 【替换OpenClash插件配置文件】 )',
+    'standard': '🌐 自动分流 - 单/双代理订阅家用模式 (V0.2.5)：面向日常或家用场景，支持配置单机场或双机场（主力+备用）订阅地址，自动聚合节点并提供全自动区域流控、延迟优化与丰富的主流分流规则。同时兼顾DNS防泄漏和WebRTC防泄漏。<br>⚠️ clash运行该yaml文件后，可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组，根据使用需求自行设置；除 直连、拒绝 策略组，其他策略组均是自动切换最低延时节点；可手动选择，但会在3-6小时后自动切换到延时最低节点；分流/防泄漏前提要自行配置clash插件 或 本页面右上角下载clash插件配置文件替换，具体操作可参考：[' + guideLink + ']的操作说明 - 【替换OpenClash插件配置文件】',
     'sk-convert': '🛠️ Socks5 / SK 格式转换工具：提供独立的格式批量转换服务，将“IP|端口|账号|密码”格式转换为标准的 socks5:// 协议链接。转换结果可直接复制，用于链式代理或其他代理软件。'
 };
 
@@ -284,7 +310,7 @@ async function fetchCountryByHost(host) {
     let ip = host;
     if (!isIPv4(host)) {
         try {
-            const dnsRes = await fetch(\`https://1.1.1.1/dns-query?name=\${encodeURIComponent(host)}&type=A\`, {
+            const dnsRes = await fetch('https://1.1.1.1/dns-query?name=' + encodeURIComponent(host) + '&type=A', {
                 headers: { 'accept': 'application/dns-json' }
             });
             const dnsData = await dnsRes.json();
@@ -298,7 +324,7 @@ async function fetchCountryByHost(host) {
     }
     if (!isIPv4(ip)) return "通用";
     try {
-        const geoRes = await fetch(\`https://ip-api.com/json/\${ip}?fields=countryCode,country\`);
+        const geoRes = await fetch('https://ip-api.com/json/' + ip + '?fields=countryCode,country');
         const geoData = await geoRes.json();
         if (geoData && geoData.countryCode) {
             const code = geoData.countryCode.toUpperCase();
@@ -408,10 +434,10 @@ function convertSkFormat() {
             const user = parts[2].trim();
             const pass = parts[3].trim();
 
-            const formatted = \`socks5://\${user}:\${pass}@\${host}:\${port}\`;
+            const formatted = 'socks5://' + user + ':' + pass + '@' + host + ':' + port;
             results.push(formatted);
         } else {
-            results.push(\`// 格式错误或不完整: \${line}\`);
+            results.push('// 格式错误或不完整: ' + line);
         }
     }
 
@@ -469,52 +495,50 @@ function addNodeCard(defaultLink = "") {
     const container = document.getElementById('nodesContainer');
     const card = document.createElement('div');
     card.className = 'node-card';
-    card.id = \`node-card-\${nodeCount}\`;
+    card.id = 'node-card-' + nodeCount;
 
     let optionsHtml = '';
     commonCountries.forEach(c => {
-        optionsHtml += \`<option value="\${c}">\${c}</option>\`;
+        optionsHtml += '<option value="' + c + '">' + c + '</option>';
     });
 
-    card.innerHTML = \`
-        <div class="btn-card-actions">
-            <button class="btn-action btn-lookup" onclick="manualLookupCard(\${nodeCount})">🔍 联网查询</button>
-            <button class="btn-action btn-clear" onclick="clearNodeText('node-link-\${nodeCount}', 'node-country-\${nodeCount}', \${nodeCount})">🧹 清空</button>
-            <button class="btn-action btn-remove" onclick="removeNodeCard('node-card-\${nodeCount}')">✕ 删除</button>
-        </div>
-        <div class="row" style="margin-bottom: 8px;">
-            <div style="flex: 1;">
-                <label>国家 / 地区标签 <span class="tag" id="node-tag-\${nodeCount}">🤖 自动识别</span><span class="tip-tag">⚠️ 显示“通用”可直接下拉选择，或直接输入自定义名称</span>:</label>
-                <div style="display: flex; gap: 8px;">
-                    <select id="node-country-\${nodeCount}" class="node-country" onchange="markUserEdited(\${nodeCount})" style="flex: 1;">
-                        \${optionsHtml}
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div>
-            <label>节点协议链接 (支持 vless / vmess / trojan / hysteria2 / socks5):</label>
-            <textarea id="node-link-\${nodeCount}" class="node-link" rows="2" placeholder="粘贴单个节点的协议链接..." oninput="updateCardCountry(this, \${nodeCount})">\${defaultLink}</textarea>
-        </div>
-    \`;
+    card.innerHTML = '<div class="btn-card-actions">' +
+            '<button class="btn-action btn-lookup" onclick="manualLookupCard(' + nodeCount + ')">🔍 联网查询</button>' +
+            '<button class="btn-action btn-clear" onclick="clearNodeText(\\'node-link-' + nodeCount + '\\', \\'node-country-' + nodeCount + '\\', ' + nodeCount + ')">🧹 清空</button>' +
+            '<button class="btn-action btn-remove" onclick="removeNodeCard(\\'node-card-' + nodeCount + '\\')">✕ 删除</button>' +
+        '</div>' +
+        '<div class="row" style="margin-bottom: 8px;">' +
+            '<div style="flex: 1;">' +
+                '<label>国家 / 地区标签 <span class="tag" id="node-tag-' + nodeCount + '">🤖 自动识别</span><span class="tip-tag">⚠️ 显示“通用”可直接下拉选择，或直接输入自定义名称</span>:</label>' +
+                '<div style="display: flex; gap: 8px;">' +
+                    '<select id="node-country-' + nodeCount + '" class="node-country" onchange="markUserEdited(' + nodeCount + ')" style="flex: 1;">' +
+                        optionsHtml +
+                    '</select>' +
+                '</div>' +
+            '</div>' +
+        '</div>' +
+        '<div>' +
+            '<label>节点协议链接 (支持 vless / vmess / trojan / hysteria2 / socks5):</label>' +
+            '<textarea id="node-link-' + nodeCount + '" class="node-link" rows="2" placeholder="粘贴单个节点的协议链接..." oninput="updateCardCountry(this, ' + nodeCount + ')">' + defaultLink + '</textarea>' +
+        '</div>';
     container.appendChild(card);
     if (defaultLink) {
         updateCardCountry(card.querySelector('.node-link'), nodeCount);
     } else {
-        document.getElementById(\`node-country-\${nodeCount}\`).value = "通用";
+        document.getElementById('node-country-' + nodeCount).value = "通用";
     }
 }
 
 function markUserEdited(id) {
-    const countrySelect = document.getElementById(\`node-country-\${id}\`);
-    const tag = document.getElementById(\`node-tag-\${id}\`);
+    const countrySelect = document.getElementById('node-country-' + id);
+    const tag = document.getElementById('node-tag-' + id);
     if (countrySelect) countrySelect.dataset.userEdited = "true";
     if (tag) tag.innerText = "✍️ 手动指定";
 }
 
 async function updateCardCountry(textarea, id) {
-    const countrySelect = document.getElementById(\`node-country-\${id}\`);
-    const tag = document.getElementById(\`node-tag-\${id}\`);
+    const countrySelect = document.getElementById('node-country-' + id);
+    const tag = document.getElementById('node-tag-' + id);
     if (countrySelect && countrySelect.dataset.userEdited === "true") return;
 
     const val = textarea.value.trim();
@@ -540,8 +564,8 @@ async function updateCardCountry(textarea, id) {
 }
 
 async function manualLookupCard(id) {
-    const textarea = document.getElementById(\`node-link-\${id}\`);
-    const countrySelect = document.getElementById(\`node-country-\${id}\`);
+    const textarea = document.getElementById('node-link-' + id);
+    const countrySelect = document.getElementById('node-country-' + id);
     if (countrySelect) delete countrySelect.dataset.userEdited;
     if (textarea) await updateCardCountry(textarea, id);
 }
@@ -559,7 +583,7 @@ function clearNodeText(textareaId, countryInputId, id) {
         cel.value = "通用";
         delete cel.dataset.userEdited;
     }
-    const tag = document.getElementById(\`node-tag-\${id}\`);
+    const tag = document.getElementById('node-tag-' + id);
     if (tag) tag.innerText = "🤖 自动识别";
 }
 
@@ -665,14 +689,14 @@ function formatInlineYaml(obj) {
     const parts = [];
     for (const [key, val] of Object.entries(obj)) {
         if (typeof val === 'object' && val !== null) {
-            parts.push(\`\${key}: \${formatInlineYaml(val)}\`);
+            parts.push(key + ': ' + formatInlineYaml(val));
         } else if (typeof val === 'boolean' || typeof val === 'number') {
-            parts.push(\`\${key}: \${val}\`);
+            parts.push(key + ': ' + val);
         } else {
-            parts.push(\`\${key}: "\${val}"\`);
+            parts.push(key + ': "' + val + '"');
         }
     }
-    return \`{\${parts.join(', ')}}\`;
+    return '{' + parts.join(', ') + '}';
 }
 
 async function downloadYaml() {
@@ -725,586 +749,586 @@ async function generateYaml(autoDownload = false) {
         const subName2 = document.getElementById('stdSubName2').value.trim() || '备用服务商';
         const subUrl2 = document.getElementById('stdSubUrl2').value.trim() || 'https://your-backup-sub-domain.com/link/token';
 
-        let proxyProvidersBlock = \`  \${subName1}:
-    url: "\${subUrl1}"
-    type: http
-    interval: 86400
-    exclude-filter: 流量|账号|剩余|到期|过期|测试|试用|TG|群|官网|Expire|APP|官方|异常|邮箱|防|卸载|@|距离     
-    health-check:
-      enable: true
-      url: https://www.gstatic.com/generate_204
-      interval: 600
-      timeout: 3000
-      expected-status: 204
-      lazy: true\`;
+        let proxyProvidersBlock = '  ' + subName1 + ':\\n' +
+            '    url: "' + subUrl1 + '"\\n' +
+            '    type: http\\n' +
+            '    interval: 86400\\n' +
+            '    exclude-filter: 流量|账号|剩余|到期|过期|测试|试用|TG|群|官网|Expire|APP|官方|异常|邮箱|防|卸载|@|距离     \\n' +
+            '    health-check:\\n' +
+            '      enable: true\\n' +
+            '      url: https://www.gstatic.com/generate_204\\n' +
+            '      interval: 600\\n' +
+            '      timeout: 3000\\n' +
+            '      expected-status: 204\\n' +
+            '      lazy: true';
 
-        let useProvidersForGroups = \`      - \${subName1}\`;
+        let useProvidersForGroups = '      - ' + subName1;
 
         if (enableBackup) {
-            proxyProvidersBlock += \`\\n\\n  \${subName2}:
-    url: "\${subUrl2}"
-    type: http
-    interval: 86400
-    exclude-filter: 流量|账号|剩余|到期|过期|测试|试用|TG|群|官网|Expire|APP|官方|异常|邮箱|防|卸载|@|距离     
-    health-check:
-      enable: true
-      url: https://www.gstatic.com/generate_204
-      interval: 600
-      timeout: 3000
-      expected-status: 204
-      lazy: true\`;
-            useProvidersForGroups += \`\\n      - \${subName2}\`;
+            proxyProvidersBlock += '\\n\\n  ' + subName2 + ':\\n' +
+                '    url: "' + subUrl2 + '"\\n' +
+                '    type: http\\n' +
+                '    interval: 86400\\n' +
+                '    exclude-filter: 流量|账号|剩余|到期|过期|测试|试用|TG|群|官网|Expire|APP|官方|异常|邮箱|防|卸载|@|距离     \\n' +
+                '    health-check:\\n' +
+                '      enable: true\\n' +
+                '      url: https://www.gstatic.com/generate_204\\n' +
+                '      interval: 600\\n' +
+                '      timeout: 3000\\n' +
+                '      expected-status: 204\\n' +
+                '      lazy: true';
+            useProvidersForGroups += '\\n      - ' + subName2;
         }
 
         lastGeneratedYaml = 
-\`# ====================================================================
-# 配置名称：OpenClash 区域全自动流控与延迟优化 (\${enableBackup ? '双机场融合版' : '单机场标准版'})
-# 版本号：V0.2.5 (生产环境推荐版)
-# 内核要求：Mihomo (Meta) Kernel 专属
-# ====================================================================
-
-port: 7890
-socks-port: 7891
-redir-port: 7892
-mixed-port: 7893
-tproxy-port: 7895
-
-allow-lan: true
-mode: rule
-log-level: info
-external-controller: 0.0.0.0:9090
-secret: "123456"
-ipv6: true
-unified-delay: true
-tcp-concurrent: true
-
-proxy-providers:
-\${proxyProvidersBlock}
-      
-proxies:
-  - {name: 直连, type: direct}
-  - {name: 拒绝, type: reject}
-
-dns:
-  enable: true
-  listen: 0.0.0.0:7874
-  ipv6: true
-  enhanced-mode: fake-ip
-  fake-ip-range: 198.18.0.1/16
-  respect-rules: true 
-  fake-ip-filter-mode: blacklist
-  fake-ip-filter:
-    - +.lan
-    - +.local
-    - localhost
-    - '*.localdomain'
-    - 'peer.tampermonkey.net'
-    - 'workgroup'
-    - geosite:cn
-    - +.msftconnecttest.com
-    - +.msftncsi.com
-    - +.gov.cn
-    - +.12306.cn
-    - +.chsi.com.cn
-    - +.apple.com
-    - +.icloud.com
-    - +.baidu.com
-    - +.amap.com
-    - +.alipay.com
-    - +.alipayobjects.com
-    - +.wechat.com
-    - +.wechatpay.cn
-    - +.unionpay.com
-    - +.95516.com
-    - +.tenpay.com
-    - +.95559.com.cn
-    - +.95599.cn
-    - +.abchina.com
-    - +.icbc.com.cn
-    - +.ccb.com
-    - +.boc.cn
-    - +.cmbchina.com
-
-  default-nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
-  
-  proxy-server-nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
-    
-  nameserver-policy:
-    "geosite:cn,private":
-      - 223.5.5.5
-      - 119.29.29.29
-      - https://dns.alidns.com/dns-query
-      - https://doh.pub/dns-query
-    "geosite:geolocation-!cn":
-      - https://dns.google/dns-query
-      - https://1.1.1.1/dns-query
-
-  nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
-
-tun:
-  enable: true
-  stack: mixed
-  device: utun
-  auto-route: true
-  auto-detect-interface: true
-  auto-redirect: true
-  strict-route: true
-
-profile:
-  store-selected: true
-  store-fake-ip: true
-
-default: &default
-  type: select
-  proxies:
-    - 直连
-    - 所有-自动          
-    - 所有-手动
-    - 香港-故转
-    - 台湾-故转
-    - 日本-故转
-    - 新加坡-故转
-    - 韩国-故转
-    - 美国-故转
-    - 英国-故转
-    - 其他-故转
-    - 拒绝
-
-proxy-groups:
-  - {name: ChatGPT, <<: *default}
-  - {name: Gemini, <<: *default}
-  - {name: Copilot, <<: *default}
-  - {name: Perplexity, <<: *default}
-  - {name: Claude, <<: *default}
-  - {name: Meta AI, <<: *default}
-  - {name: Grok, <<: *default}
-  - {name: Groq, <<: *default}
-  - {name: GitHub, <<: *default}
-  - {name: Reddit, <<: *default}
-  - {name: Telegram, <<: *default}
-  - {name: WhatsApp, <<: *default}
-  - {name: Facebook, <<: *default}
-  - {name: BiliBili, <<: *default}
-  - {name: YouTube, <<: *default}
-  - {name: TikTok, <<: *default}
-  - {name: Netflix, <<: *default}
-  - {name: HBO, <<: *default}
-  - {name: Disney, <<: *default}
-  - {name: Amazon, <<: *default}
-  - {name: Crunchyroll, <<: *default}
-  - {name: Popcorn, <<: *default}
-  - {name: Spotify, <<: *default}
-  - {name: Nvidia, <<: *default}
-  - {name: Steam, <<: *default}
-  - {name: Games, <<: *default}
-  - {name: Crypto, <<: *default}
-  - {name: Apple, <<: *default}
-  - {name: Google, <<: *default}
-  - {name: Microsoft, <<: *default}
-  - {name: Test, <<: *default}
-  - {name: Block, <<: *default}
-  - {name: 国外, <<: *default}
-  - {name: 国内, <<: *default}
-  - {name: 其他, <<: *default}
-  
-  - name: 所有-手动
-    type: select
-    use:
-\${useProvidersForGroups}
-    exclude-filter: "直连|拒绝"
-
-  - name: 所有-自动
-    type: url-test
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000          
-    use:
-\${useProvidersForGroups}
-    tolerance: 30
-    lazy: true
-    exclude-filter: "直连|拒绝" 
-    use-provider-health: true
-    
-  - name: 香港-故转
-    type: fallback
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000          
-    proxies:
-      - 香港-自动          
-      - 香港-手动
-  - name: 香港-手动
-    type: select
-    use:
-\${useProvidersForGroups}
-    filter: "广港|香港|HK|Hong Kong|🇭🇰|HongKong"
-  - name: 香港-自动
-    type: url-test
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000          
-    use:
-\${useProvidersForGroups}
-    tolerance: 30
-    lazy: true                
-    filter: "广港|香港|HK|Hong Kong|🇭🇰|HongKong"
-    use-provider-health: true
- 
-  - name: 台湾-故转
-    type: fallback
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000
-    proxies:
-      - 台湾-自动          
-      - 台湾-手动
-  - name: 台湾-手动
-    type: select
-    use:
-\${useProvidersForGroups}
-    filter: "广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan"
-  - name: 台湾-自动
-    type: url-test
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000
-    use:
-\${useProvidersForGroups}
-    tolerance: 30
-    lazy: true
-    filter: "广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan"
-    use-provider-health: true
-
-  - name: 日本-故转
-    type: fallback
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000
-    proxies:
-      - 日本-自动          
-      - 日本-手动
-  - name: 日本-手动
-    type: select
-    use:
-\${useProvidersForGroups}
-    filter: "广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan"
-  - name: 日本-自动
-    type: url-test
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000
-    use:
-\${useProvidersForGroups}
-    tolerance: 30
-    lazy: true
-    filter: "广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan"
-    use-provider-health: true
-
-  - name: 新加坡-故转
-    type: fallback
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000
-    proxies:
-      - 新加坡-自动        
-      - 新加坡-手动
-  - name: 新加坡-手动
-    type: select
-    use:
-\${useProvidersForGroups}
-    filter: "广新|新加坡|SG|坡|狮城|🇸🇬|Singapore"
-  - name: 新加坡-自动
-    type: url-test
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000
-    use:
-\${useProvidersForGroups}
-    tolerance: 30
-    lazy: true
-    filter: "广新|新加坡|SG|坡|狮城|🇸🇬|Singapore"
-    use-provider-health: true
-
-  - name: 韩国-故转
-    type: fallback
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000
-    proxies:
-      - 韩国-自动          
-      - 韩国-手动
-  - name: 韩国-手动
-    type: select
-    use:
-\${useProvidersForGroups}
-    filter: "广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea"
-  - name: 韩国-自动
-    type: url-test
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000
-    use:
-\${useProvidersForGroups}
-    tolerance: 30
-    lazy: true
-    filter: "广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea"
-    use-provider-health: true
-
-  - name: 美国-故转
-    type: fallback
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000
-    proxies:
-      - 美国-自动          
-      - 美国-手动
-  - name: 美国-手动
-    type: select
-    use:
-\${useProvidersForGroups}
-    filter: "广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States"
-  - name: 美国-自动
-    type: url-test
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000
-    use:
-\${useProvidersForGroups}
-    tolerance: 30
-    lazy: true
-    filter: "广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States"
-    use-provider-health: true
-
-  - name: 英国-故转
-    type: fallback
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000
-    proxies:
-      - 英国-自动          
-      - 英国-手动
-  - name: 英国-手动
-    type: select
-    use:
-\${useProvidersForGroups}
-    filter: "英国|英|伦敦|UK|United Kingdom|🇬🇧|London"
-  - name: 英国-自动
-    type: url-test
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000
-    use:
-\${useProvidersForGroups}
-    tolerance: 30
-    lazy: true
-    filter: "英国|英|伦敦|UK|United Kingdom|🇬🇧|London"
-    use-provider-health: true
-
-  - name: 其他-故转
-    type: fallback
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000
-    proxies:
-      - 其他-自动          
-      - 其他-手动
-  - name: 其他-手动
-    type: select
-    use:
-\${useProvidersForGroups}
-    filter: "^((?!(直连|拒绝|广港|香港|HK|Hong Kong|🇭🇰|HongKong|广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan|广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|广新|新加坡|SG|坡|狮城|🇸🇬|Singapore|广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|英国|UK|United Kingdom|伦敦|英|London|🇬🇧)).)*$"
-  - name: 其他-自动
-    type: url-test
-    url: https://www.gstatic.com/generate_204
-    interval: 300
-    timeout: 3000
-    use:
-\${useProvidersForGroups}
-    tolerance: 30
-    lazy: true
-    filter: "^((?!(直连|拒绝|广港|香港|HK|Hong Kong|🇭🇰|HongKong|广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan|广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|广新|新加坡|SG|坡|狮城|🇸🇬|Singapore|广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|英国|UK|United Kingdom|伦敦|英|London|🇬🇧)).)*$"
-    use-provider-health: true
-
-rules:
-  - AND,((NETWORK,UDP),(DST-PORT,3478)),REJECT 
-  - DOMAIN-KEYWORD,webrtc,REJECT
-  - DOMAIN-KEYWORD,stun,REJECT
-  - DOMAIN-SUFFIX,stun.l.google.com,REJECT
-  - DOMAIN-SUFFIX,stun1.l.google.com,REJECT
-  - DOMAIN-SUFFIX,stun2.l.google.com,REJECT
-  - DOMAIN-SUFFIX,stun3.l.google.com,REJECT
-  - DOMAIN-SUFFIX,stun4.l.google.com,REJECT  
-
-  - DOMAIN-SUFFIX,tongdun.net,DIRECT
-  - DOMAIN-SUFFIX,ishumei.com,DIRECT
-  - DOMAIN-SUFFIX,geetest.com,DIRECT
-  - DOMAIN-SUFFIX,dingxiangyun.com,DIRECT
-  - DOMAIN-SUFFIX,unionpay.com,DIRECT
-  - DOMAIN-SUFFIX,95516.com,DIRECT
-  - DOMAIN-SUFFIX,alipay.com,DIRECT
-  - DOMAIN-SUFFIX,wechat.com,DIRECT
-  - DOMAIN-SUFFIX,wechatpay.cn,DIRECT
-  - DOMAIN-SUFFIX,tenpay.com,DIRECT
-  - DOMAIN-SUFFIX,gov.cn,DIRECT
-  - DOMAIN-SUFFIX,12306.cn,DIRECT
-  - DOMAIN-SUFFIX,chsi.com.cn,DIRECT
-  - DOMAIN-SUFFIX,chinatax.gov.cn,DIRECT
-  - DOMAIN-SUFFIX,mohrss.gov.cn,DIRECT
-  - DOMAIN-SUFFIX,gwy.gov.cn,DIRECT
-  - DOMAIN-SUFFIX,95559.com.cn,DIRECT
-  - DOMAIN-SUFFIX,95599.cn,DIRECT
-  - DOMAIN-SUFFIX,abchina.com,DIRECT
-  - DOMAIN-SUFFIX,icbc.com.cn,DIRECT
-  - DOMAIN-SUFFIX,ccb.com,DIRECT
-  - DOMAIN-SUFFIX,boc.cn,DIRECT
-  - DOMAIN-SUFFIX,cmbchina.com,DIRECT
-  - DOMAIN-SUFFIX,citicbank.com,DIRECT
-  - DOMAIN-SUFFIX,cib.com.cn,DIRECT
-  - DOMAIN-SUFFIX,spdb.com.cn,DIRECT
-  - DOMAIN-SUFFIX,cmbc.com.cn,DIRECT
-  - DOMAIN-SUFFIX,cebbank.com,DIRECT
-  - DOMAIN-SUFFIX,hxb.com.cn,DIRECT
-  - DOMAIN-SUFFIX,psbc.com,DIRECT
-  - DOMAIN-KEYWORD,bank,DIRECT
-
-  - DOMAIN-SUFFIX,10086.cn,DIRECT
-  - DOMAIN-SUFFIX,10010.com,DIRECT
-  - DOMAIN-SUFFIX,189.cn,DIRECT
-  - DOMAIN-SUFFIX,taobao.com,DIRECT
-  - DOMAIN-SUFFIX,jd.com,DIRECT
-  - DOMAIN-SUFFIX,douyin.com,DIRECT
-  - DOMAIN-SUFFIX,bilibili.com,DIRECT
-  - DOMAIN-SUFFIX,mi.com,DIRECT
-  - DOMAIN-SUFFIX,midea.com,DIRECT
-  - DOMAIN-SUFFIX,baidu.com,DIRECT
-  - DOMAIN-SUFFIX,qq.com,DIRECT
-  - DOMAIN-SUFFIX,meituan.com,DIRECT
-  - DOMAIN-SUFFIX,dianping.com,DIRECT
-  - DOMAIN-SUFFIX,amap.com,DIRECT
-  - DOMAIN-SUFFIX,163.com,DIRECT
-  - DOMAIN-SUFFIX,sohu.com,DIRECT
-  - DOMAIN-SUFFIX,sina.com.cn,DIRECT
-  - DOMAIN-SUFFIX,mi-img.com,DIRECT
-  - DOMAIN-SUFFIX,aqara.com,DIRECT
-  - DOMAIN-SUFFIX,tplinkcloud.com,DIRECT
-  - DOMAIN-SUFFIX,heislands.com,DIRECT
-  
-  - RULE-SET,Test / Domain,Test
-  - RULE-SET,Block / Domain,Block
-  - RULE-SET,ChatGPT / Domain,ChatGPT
-  - RULE-SET,Claude / Domain,Claude
-  - RULE-SET,Meta AI / Domain,Meta AI
-  - RULE-SET,Perplexity / Domain,Perplexity
-  - RULE-SET,Copilot / Domain,Copilot
-  - RULE-SET,Gemini / Domain,Gemini
-  - RULE-SET,Groq / Domain,Groq
-  - RULE-SET,Grok / Domain,Grok
-  - RULE-SET,Reddit / Domain,Reddit
-  - RULE-SET,GitHub / Domain,GitHub
-  - RULE-SET,Telegram / Domain,Telegram
-  - RULE-SET,Telegram / IP,Telegram,no-resolve
-  - RULE-SET,WhatsApp / Domain,WhatsApp
-  - RULE-SET,Facebook / Domain,Facebook
-  - RULE-SET,Apple / Domain,Apple
-  - RULE-SET,Apple-CN / Domain,Apple
-  - RULE-SET,Microsoft / Domain,Microsoft
-  - RULE-SET,OKX / Domain,Crypto
-  - RULE-SET,Bybit / Domain,Crypto
-  - RULE-SET,Binance / Domain,Crypto
-  - RULE-SET,BiliBili / Domain,BiliBili
-  - RULE-SET,YouTube / Domain,YouTube
-  - RULE-SET,TikTok / Domain,TikTok
-  - RULE-SET,Netflix / Domain,Netflix
-  - RULE-SET,Netflix / IP,Netflix,no-resolve
-  - DOMAIN-KEYWORD,netflix,Netflix
-  - RULE-SET,Disney / Domain,Disney
-  - RULE-SET,Amazon / Domain,Amazon
-  - RULE-SET,Crunchyroll / Domain,Crunchyroll
-  - RULE-SET,Popcorn / Domain,Popcorn
-  - RULE-SET,HBO / Domain,HBO
-  - RULE-SET,Spotify / Domain,Spotify
-  - RULE-SET,Steam / Domain,Steam
-  - RULE-SET,Epic / Domain,Games
-  - RULE-SET,EA / Domain,Games
-  - RULE-SET,Blizzard / Domain,Games
-  - RULE-SET,UBI / Domain,Games
-  - RULE-SET,PlayStation / Domain,Games
-  - RULE-SET,Nintendo / Domain,Games
-  - RULE-SET,Google / Domain,Google
-  - RULE-SET,Google / IP,Google,no-resolve
-  - RULE-SET,Nvidia / Domain,Nvidia
-  - RULE-SET,Proxy / Domain,国外
-  - RULE-SET,Globe / Domain,国外
-  - RULE-SET,Direct / Domain,国内
-  - RULE-SET,China / Domain,国内
-  - RULE-SET,China / IP,国内,no-resolve
-  - RULE-SET,Private / Domain,国内
-  - MATCH,其他
-
-rule-anchor:
-  ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}
-  domain: &domain {type: http, interval: 86400, behavior: domain, format: mrs}
-  class: &class {type: http, interval: 86400, behavior: classical, format: text}
-
-rule-providers:
-  Test / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Check.list"}
-  ChatGPT / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/openai.mrs"}
-  Claude / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Claude/Claude.list"}
-  Meta AI / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/MetaAi.list"}
-  Perplexity / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/perplexity.mrs"}
-  Copilot / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Copilot.list"}
-  Gemini / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/gemini.mrs"}
-  GitHub / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/github.mrs"}
-  Telegram / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/telegram.mrs"}
-  Telegram / IP: {<<: *ip, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/telegram.mrs"}
-  WhatsApp / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Whatsapp/Whatsapp.list"}
-  Facebook / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/facebook.mrs"}
-  Amazon / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/amazon.mrs"}
-  Apple-CN / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/apple-cn.mrs"}
-  Apple / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/apple.mrs"}
-  Microsoft / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/microsoft.mrs"}
-  OKX / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/okx.mrs"}
-  Bybit / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/bybit.mrs"}
-  Binance / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/binance.mrs"}
-  TikTok / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/tiktok.mrs"}
-  Netflix / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/netflix.mrs"}
-  Netflix / IP: {<<: *ip, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/netflix.mrs"}
-  Disney / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/disney.mrs"}
-  HBO / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/hbo.mrs"}
-  Spotify / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/spotify.mrs"}
-  Steam / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/steam.mrs"}
-  Epic / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Epic/Epic.list"}
-  EA / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/EA/EA.list"}
-  Blizzard / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Blizzard/Blizzard.list"}
-  UBI / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/UBI/UBI.list"}
-  PlayStation / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/PlayStation/PlayStation.list"}
-  Nintendo / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Nintendo/Nintendo.list"}
-  Proxy / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Proxy.list"}
-  Globe / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Global/Global.list"}
-  Block / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Block.list"}
-  Nvidia / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Nvidia/Nvidia.list"}
-  Crunchyroll / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Crunchyroll.list"}
-  Reddit / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/reddit.mrs"}
-  Groq / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/groq.mrs"}
-  Grok / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Grok.list"}
-  Popcorn / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Popcorn.list"}
-  Direct / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Direct.list"}
-  Private / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/private.mrs"}
-  China / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/cn.mrs"}
-  China / IP: {<<: *ip, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/cn.mrs"}
-  YouTube / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/youtube.mrs"}
-  Google / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/google.mrs"}
-  Google / IP: {<<: *ip, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/google.mrs"}
-  BiliBili / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/bilibili.mrs"}\`;
+'# ====================================================================\\n' +
+'# 配置名称：OpenClash 区域全自动流控与延迟优化 (' + (enableBackup ? '双机场融合版' : '单机场标准版') + ')\\n' +
+'# 版本号：V0.2.5 (生产环境推荐版)\\n' +
+'# 内核要求：Mihomo (Meta) Kernel 专属\\n' +
+'# ====================================================================\\n' +
+'\\n' +
+'port: 7890\\n' +
+'socks-port: 7891\\n' +
+'redir-port: 7892\\n' +
+'mixed-port: 7893\\n' +
+'tproxy-port: 7895\\n' +
+'\\n' +
+'allow-lan: true\\n' +
+'mode: rule\\n' +
+'log-level: info\\n' +
+'external-controller: 0.0.0.0:9090\\n' +
+'secret: "123456"\\n' +
+'ipv6: true\\n' +
+'unified-delay: true\\n' +
+'tcp-concurrent: true\\n' +
+'\\n' +
+'proxy-providers:\\n' +
+proxyProvidersBlock + '\\n' +
+'      \\n' +
+'proxies:\\n' +
+'  - {name: 直连, type: direct}\\n' +
+'  - {name: 拒绝, type: reject}\\n' +
+'\\n' +
+'dns:\\n' +
+'  enable: true\\n' +
+'  listen: 0.0.0.0:7874\\n' +
+'  ipv6: true\\n' +
+'  enhanced-mode: fake-ip\\n' +
+'  fake-ip-range: 198.18.0.1/16\\n' +
+'  respect-rules: true \\n' +
+'  fake-ip-filter-mode: blacklist\\n' +
+'  fake-ip-filter:\\n' +
+'    - +.lan\\n' +
+'    - +.local\\n' +
+'    - localhost\\n' +
+'    - \\'*.localdomain\\'\\n' +
+'    - \\'peer.tampermonkey.net\\'\\n' +
+'    - \\'workgroup\\'\\n' +
+'    - geosite:cn\\n' +
+'    - +.msftconnecttest.com\\n' +
+'    - +.msftncsi.com\\n' +
+'    - +.gov.cn\\n' +
+'    - +.12306.cn\\n' +
+'    - +.chsi.com.cn\\n' +
+'    - +.apple.com\\n' +
+'    - +.icloud.com\\n' +
+'    - +.baidu.com\\n' +
+'    - +.amap.com\\n' +
+'    - +.alipay.com\\n' +
+'    - +.alipayobjects.com\\n' +
+'    - +.wechat.com\\n' +
+'    - +.wechatpay.cn\\n' +
+'    - +.unionpay.com\\n' +
+'    - +.95516.com\\n' +
+'    - +.tenpay.com\\n' +
+'    - +.95559.com.cn\\n' +
+'    - +.95599.cn\\n' +
+'    - +.abchina.com\\n' +
+'    - +.icbc.com.cn\\n' +
+'    - +.ccb.com\\n' +
+'    - +.boc.cn\\n' +
+'    - +.cmbchina.com\\n' +
+'\\n' +
+'  default-nameserver:\\n' +
+'    - 223.5.5.5\\n' +
+'    - 119.29.29.29\\n' +
+'  \\n' +
+'  proxy-server-nameserver:\\n' +
+'    - 223.5.5.5\\n' +
+'    - 119.29.29.29\\n' +
+'    \\n' +
+'  nameserver-policy:\\n' +
+'    "geosite:cn,private":\\n' +
+'      - 223.5.5.5\\n' +
+'      - 119.29.29.29\\n' +
+'      - https://dns.alidns.com/dns-query\\n' +
+'      - https://doh.pub/dns-query\\n' +
+'    "geosite:geolocation-!cn":\\n' +
+'      - https://dns.google/dns-query\\n' +
+'      - https://1.1.1.1/dns-query\\n' +
+'\\n' +
+'  nameserver:\\n' +
+'    - 223.5.5.5\\n' +
+'    - 119.29.29.29\\n' +
+'\\n' +
+'tun:\\n' +
+'  enable: true\\n' +
+'  stack: mixed\\n' +
+'  device: utun\\n' +
+'  auto-route: true\\n' +
+'  auto-detect-interface: true\\n' +
+'  auto-redirect: true\\n' +
+'  strict-route: true\\n' +
+'\\n' +
+'profile:\\n' +
+'  store-selected: true\\n' +
+'  store-fake-ip: true\\n' +
+'\\n' +
+'default: &default\\n' +
+'  type: select\\n' +
+'  proxies:\\n' +
+'    - 直连\\n' +
+'    - 所有-自动          \\n' +
+'    - 所有-手动\\n' +
+'    - 香港-故转\\n' +
+'    - 台湾-故转\\n' +
+'    - 日本-故转\\n' +
+'    - 新加坡-故转\\n' +
+'    - 韩国-故转\\n' +
+'    - 美国-故转\\n' +
+'    - 英国-故转\\n' +
+'    - 其他-故转\\n' +
+'    - 拒绝\\n' +
+'\\n' +
+'proxy-groups:\\n' +
+'  - {name: ChatGPT, <<: *default}\\n' +
+'  - {name: Gemini, <<: *default}\\n' +
+'  - {name: Copilot, <<: *default}\\n' +
+'  - {name: Perplexity, <<: *default}\\n' +
+'  - {name: Claude, <<: *default}\\n' +
+'  - {name: Meta AI, <<: *default}\\n' +
+'  - {name: Grok, <<: *default}\\n' +
+'  - {name: Groq, <<: *default}\\n' +
+'  - {name: GitHub, <<: *default}\\n' +
+'  - {name: Reddit, <<: *default}\\n' +
+'  - {name: Telegram, <<: *default}\\n' +
+'  - {name: WhatsApp, <<: *default}\\n' +
+'  - {name: Facebook, <<: *default}\\n' +
+'  - {name: BiliBili, <<: *default}\\n' +
+'  - {name: YouTube, <<: *default}\\n' +
+'  - {name: TikTok, <<: *default}\\n' +
+'  - {name: Netflix, <<: *default}\\n' +
+'  - {name: HBO, <<: *default}\\n' +
+'  - {name: Disney, <<: *default}\\n' +
+'  - {name: Amazon, <<: *default}\\n' +
+'  - {name: Crunchyroll, <<: *default}\\n' +
+'  - {name: Popcorn, <<: *default}\\n' +
+'  - {name: Spotify, <<: *default}\\n' +
+'  - {name: Nvidia, <<: *default}\\n' +
+'  - {name: Steam, <<: *default}\\n' +
+'  - {name: Games, <<: *default}\\n' +
+'  - {name: Crypto, <<: *default}\\n' +
+'  - {name: Apple, <<: *default}\\n' +
+'  - {name: Google, <<: *default}\\n' +
+'  - {name: Microsoft, <<: *default}\\n' +
+'  - {name: Test, <<: *default}\\n' +
+'  - {name: Block, <<: *default}\\n' +
+'  - {name: 国外, <<: *default}\\n' +
+'  - {name: 国内, <<: *default}\\n' +
+'  - {name: 其他, <<: *default}\\n' +
+'  \\n' +
+'  - name: 所有-手动\\n' +
+'    type: select\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    exclude-filter: "直连|拒绝"\\n' +
+'\\n' +
+'  - name: 所有-自动\\n' +
+'    type: url-test\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000          \\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    tolerance: 30\\n' +
+'    lazy: true\\n' +
+'    exclude-filter: "直连|拒绝" \\n' +
+'    use-provider-health: true\\n' +
+'    \\n' +
+'  - name: 香港-故转\\n' +
+'    type: fallback\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000          \\n' +
+'    proxies:\\n' +
+'      - 香港-自动          \\n' +
+'      - 香港-手动\\n' +
+'  - name: 香港-手动\\n' +
+'    type: select\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    filter: "广港|香港|HK|Hong Kong|🇭🇰|HongKong"\\n' +
+'  - name: 香港-自动\\n' +
+'    type: url-test\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000          \\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    tolerance: 30\\n' +
+'    lazy: true                \\n' +
+'    filter: "广港|香港|HK|Hong Kong|🇭🇰|HongKong"\\n' +
+'    use-provider-health: true\\n' +
+' \\n' +
+'  - name: 台湾-故转\\n' +
+'    type: fallback\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000\\n' +
+'    proxies:\\n' +
+'      - 台湾-自动          \\n' +
+'      - 台湾-手动\\n' +
+'  - name: 台湾-手动\\n' +
+'    type: select\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    filter: "广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan"\\n' +
+'  - name: 台湾-自动\\n' +
+'    type: url-test\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    tolerance: 30\\n' +
+'    lazy: true\\n' +
+'    filter: "广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan"\\n' +
+'    use-provider-health: true\\n' +
+'\\n' +
+'  - name: 日本-故转\\n' +
+'    type: fallback\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000\\n' +
+'    proxies:\\n' +
+'      - 日本-自动          \\n' +
+'      - 日本-手动\\n' +
+'  - name: 日本-手动\\n' +
+'    type: select\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    filter: "广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan"\\n' +
+'  - name: 日本-自动\\n' +
+'    type: url-test\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    tolerance: 30\\n' +
+'    lazy: true\\n' +
+'    filter: "广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan"\\n' +
+'    use-provider-health: true\\n' +
+'\\n' +
+'  - name: 新加坡-故转\\n' +
+'    type: fallback\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000\\n' +
+'    proxies:\\n' +
+'      - 新加坡-自动        \\n' +
+'      - 新加坡-手动\\n' +
+'  - name: 新加坡-手动\\n' +
+'    type: select\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    filter: "广新|新加坡|SG|坡|狮城|🇸🇬|Singapore"\\n' +
+'  - name: 新加坡-自动\\n' +
+'    type: url-test\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    tolerance: 30\\n' +
+'    lazy: true\\n' +
+'    filter: "广新|新加坡|SG|坡|狮城|🇸🇬|Singapore"\\n' +
+'    use-provider-health: true\\n' +
+'\\n' +
+'  - name: 韩国-故转\\n' +
+'    type: fallback\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000\\n' +
+'    proxies:\\n' +
+'      - 韩国-自动          \\n' +
+'      - 韩国-手动\\n' +
+'  - name: 韩国-手动\\n' +
+'    type: select\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    filter: "广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea"\\n' +
+'  - name: 韩国-自动\\n' +
+'    type: url-test\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    tolerance: 30\\n' +
+'    lazy: true\\n' +
+'    filter: "广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea"\\n' +
+'    use-provider-health: true\\n' +
+'\\n' +
+'  - name: 美国-故转\\n' +
+'    type: fallback\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000\\n' +
+'    proxies:\\n' +
+'      - 美国-自动          \\n' +
+'      - 美国-手动\\n' +
+'  - name: 美国-手动\\n' +
+'    type: select\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    filter: "广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States"\\n' +
+'  - name: 美国-自动\\n' +
+'    type: url-test\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    tolerance: 30\\n' +
+'    lazy: true\\n' +
+'    filter: "广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States"\\n' +
+'    use-provider-health: true\\n' +
+'\\n' +
+'  - name: 英国-故转\\n' +
+'    type: fallback\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000\\n' +
+'    proxies:\\n' +
+'      - 英国-自动          \\n' +
+'      - 英国-手动\\n' +
+'  - name: 英国-手动\\n' +
+'    type: select\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    filter: "英国|英|伦敦|UK|United Kingdom|🇬🇧|London"\\n' +
+'  - name: 英国-自动\\n' +
+'    type: url-test\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    tolerance: 30\\n' +
+'    lazy: true\\n' +
+'    filter: "英国|英|伦敦|UK|United Kingdom|🇬🇧|London"\\n' +
+'    use-provider-health: true\\n' +
+'\\n' +
+'  - name: 其他-故转\\n' +
+'    type: fallback\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000\\n' +
+'    proxies:\\n' +
+'      - 其他-自动          \\n' +
+'      - 其他-手动\\n' +
+'  - name: 其他-手动\\n' +
+'    type: select\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    filter: "^((?!(直连|拒绝|广港|香港|HK|Hong Kong|🇭🇰|HongKong|广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan|广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|广新|新加坡|SG|坡|狮城|🇸🇬|Singapore|广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|英国|UK|United Kingdom|伦敦|英|London|🇬🇧)).)*$"\\n' +
+'  - name: 其他-自动\\n' +
+'    type: url-test\\n' +
+'    url: https://www.gstatic.com/generate_204\\n' +
+'    interval: 300\\n' +
+'    timeout: 3000\\n' +
+'    use:\\n' +
+useProvidersForGroups + '\\n' +
+'    tolerance: 30\\n' +
+'    lazy: true\\n' +
+'    filter: "^((?!(直连|拒绝|广港|香港|HK|Hong Kong|🇭🇰|HongKong|广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan|广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|广新|新加坡|SG|坡|狮城|🇸🇬|Singapore|广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|英国|UK|United Kingdom|伦敦|英|London|🇬🇧)).)*$"\\n' +
+'    use-provider-health: true\\n' +
+'\\n' +
+'rules:\\n' +
+'  - AND,((NETWORK,UDP),(DST-PORT,3478)),REJECT \\n' +
+'  - DOMAIN-KEYWORD,webrtc,REJECT\\n' +
+'  - DOMAIN-KEYWORD,stun,REJECT\\n' +
+'  - DOMAIN-SUFFIX,stun.l.google.com,REJECT\\n' +
+'  - DOMAIN-SUFFIX,stun1.l.google.com,REJECT\\n' +
+'  - DOMAIN-SUFFIX,stun2.l.google.com,REJECT\\n' +
+'  - DOMAIN-SUFFIX,stun3.l.google.com,REJECT\\n' +
+'  - DOMAIN-SUFFIX,stun4.l.google.com,REJECT  \\n' +
+'\\n' +
+'  - DOMAIN-SUFFIX,tongdun.net,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,ishumei.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,geetest.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,dingxiangyun.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,unionpay.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,95516.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,alipay.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,wechat.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,wechatpay.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,tenpay.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,gov.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,12306.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,chsi.com.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,chinatax.gov.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,mohrss.gov.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,gwy.gov.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,95559.com.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,95599.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,abchina.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,icbc.com.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,ccb.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,boc.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,cmbchina.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,citicbank.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,cib.com.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,spdb.com.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,cmbc.com.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,cebbank.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,hxb.com.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,psbc.com,DIRECT\\n' +
+'  - DOMAIN-KEYWORD,bank,DIRECT\\n' +
+'\\n' +
+'  - DOMAIN-SUFFIX,10086.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,10010.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,189.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,taobao.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,jd.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,douyin.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,bilibili.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,mi.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,midea.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,baidu.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,qq.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,meituan.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,dianping.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,amap.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,163.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,sohu.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,sina.com.cn,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,mi-img.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,aqara.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,tplinkcloud.com,DIRECT\\n' +
+'  - DOMAIN-SUFFIX,heislands.com,DIRECT\\n' +
+'  \\n' +
+'  - RULE-SET,Test / Domain,Test\\n' +
+'  - RULE-SET,Block / Domain,Block\\n' +
+'  - RULE-SET,ChatGPT / Domain,ChatGPT\\n' +
+'  - RULE-SET,Claude / Domain,Claude\\n' +
+'  - RULE-SET,Meta AI / Domain,Meta AI\\n' +
+'  - RULE-SET,Perplexity / Domain,Perplexity\\n' +
+'  - RULE-SET,Copilot / Domain,Copilot\\n' +
+'  - RULE-SET,Gemini / Domain,Gemini\\n' +
+'  - RULE-SET,Groq / Domain,Groq\\n' +
+'  - RULE-SET,Grok / Domain,Grok\\n' +
+'  - RULE-SET,Reddit / Domain,Reddit\\n' +
+'  - RULE-SET,GitHub / Domain,GitHub\\n' +
+'  - RULE-SET,Telegram / Domain,Telegram\\n' +
+'  - RULE-SET,Telegram / IP,Telegram,no-resolve\\n' +
+'  - RULE-SET,WhatsApp / Domain,WhatsApp\\n' +
+'  - RULE-SET,Facebook / Domain,Facebook\\n' +
+'  - RULE-SET,Apple / Domain,Apple\\n' +
+'  - RULE-SET,Apple-CN / Domain,Apple\\n' +
+'  - RULE-SET,Microsoft / Domain,Microsoft\\n' +
+'  - RULE-SET,OKX / Domain,Crypto\\n' +
+'  - RULE-SET,Bybit / Domain,Crypto\\n' +
+'  - RULE-SET,Binance / Domain,Crypto\\n' +
+'  - RULE-SET,BiliBili / Domain,BiliBili\\n' +
+'  - RULE-SET,YouTube / Domain,YouTube\\n' +
+'  - RULE-SET,TikTok / Domain,TikTok\\n' +
+'  - RULE-SET,Netflix / Domain,Netflix\\n' +
+'  - RULE-SET,Netflix / IP,Netflix,no-resolve\\n' +
+'  - DOMAIN-KEYWORD,netflix,Netflix\\n' +
+'  - RULE-SET,Disney / Domain,Disney\\n' +
+'  - RULE-SET,Amazon / Domain,Amazon\\n' +
+'  - RULE-SET,Crunchyroll / Domain,Crunchyroll\\n' +
+'  - RULE-SET,Popcorn / Domain,Popcorn\\n' +
+'  - RULE-SET,HBO / Domain,HBO\\n' +
+'  - RULE-SET,Spotify / Domain,Spotify\\n' +
+'  - RULE-SET,Steam / Domain,Steam\\n' +
+'  - RULE-SET,Epic / Domain,Games\\n' +
+'  - RULE-SET,EA / Domain,Games\\n' +
+'  - RULE-SET,Blizzard / Domain,Games\\n' +
+'  - RULE-SET,UBI / Domain,Games\\n' +
+'  - RULE-SET,PlayStation / Domain,Games\\n' +
+'  - RULE-SET,Nintendo / Domain,Games\\n' +
+'  - RULE-SET,Google / Domain,Google\\n' +
+'  - RULE-SET,Google / IP,Google,no-resolve\\n' +
+'  - RULE-SET,Nvidia / Domain,Nvidia\\n' +
+'  - RULE-SET,Proxy / Domain,国外\\n' +
+'  - RULE-SET,Globe / Domain,国外\\n' +
+'  - RULE-SET,Direct / Domain,国内\\n' +
+'  - RULE-SET,China / Domain,国内\\n' +
+'  - RULE-SET,China / IP,国内,no-resolve\\n' +
+'  - RULE-SET,Private / Domain,国内\\n' +
+'  - MATCH,其他\\n' +
+'\\n' +
+'rule-anchor:\\n' +
+'  ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}\\n' +
+'  domain: &domain {type: http, interval: 86400, behavior: domain, format: mrs}\\n' +
+'  class: &class {type: http, interval: 86400, behavior: classical, format: text}\\n' +
+'\\n' +
+'rule-providers:\\n' +
+'  Test / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Check.list"}\\n' +
+'  ChatGPT / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/openai.mrs"}\\n' +
+'  Claude / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Claude/Claude.list"}\\n' +
+'  Meta AI / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/MetaAi.list"}\\n' +
+'  Perplexity / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/perplexity.mrs"}\\n' +
+'  Copilot / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Copilot.list"}\\n' +
+'  Gemini / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/gemini.mrs"}\\n' +
+'  GitHub / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/github.mrs"}\\n' +
+'  Telegram / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/telegram.mrs"}\\n' +
+'  Telegram / IP: {<<: *ip, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/telegram.mrs"}\\n' +
+'  WhatsApp / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Whatsapp/Whatsapp.list"}\\n' +
+'  Facebook / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/facebook.mrs"}\\n' +
+'  Amazon / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/amazon.mrs"}\\n' +
+'  Apple-CN / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/apple-cn.mrs"}\\n' +
+'  Apple / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/apple.mrs"}\\n' +
+'  Microsoft / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/microsoft.mrs"}\\n' +
+'  OKX / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/okx.mrs"}\\n' +
+'  Bybit / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/bybit.mrs"}\\n' +
+'  Binance / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/binance.mrs"}\\n' +
+'  TikTok / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/tiktok.mrs"}\\n' +
+'  Netflix / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/netflix.mrs"}\\n' +
+'  Netflix / IP: {<<: *ip, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/netflix.mrs"}\\n' +
+'  Disney / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/disney.mrs"}\\n' +
+'  HBO / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/hbo.mrs"}\\n' +
+'  Spotify / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/spotify.mrs"}\\n' +
+'  Steam / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/steam.mrs"}\\n' +
+'  Epic / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Epic/Epic.list"}\\n' +
+'  EA / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/EA/EA.list"}\\n' +
+'  Blizzard / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Blizzard/Blizzard.list"}\\n' +
+'  UBI / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/UBI/UBI.list"}\\n' +
+'  PlayStation / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/PlayStation/PlayStation.list"}\\n' +
+'  Nintendo / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Nintendo/Nintendo.list"}\\n' +
+'  Proxy / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Proxy.list"}\\n' +
+'  Globe / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Global/Global.list"}\\n' +
+'  Block / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Block.list"}\\n' +
+'  Nvidia / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Nvidia/Nvidia.list"}\\n' +
+'  Crunchyroll / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Crunchyroll.list"}\\n' +
+'  Reddit / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/reddit.mrs"}\\n' +
+'  Groq / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/groq.mrs"}\\n' +
+'  Grok / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Grok.list"}\\n' +
+'  Popcorn / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Popcorn.list"}\\n' +
+'  Direct / Domain: {<<: *class, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Direct.list"}\\n' +
+'  Private / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/private.mrs"}\\n' +
+'  China / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/cn.mrs"}\\n' +
+'  China / IP: {<<: *ip, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/cn.mrs"}\\n' +
+'  YouTube / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/youtube.mrs"}\\n' +
+'  Google / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/google.mrs"}\\n' +
+'  Google / IP: {<<: *ip, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/google.mrs"}\\n' +
+'  BiliBili / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/bilibili.mrs"}';
 
         document.getElementById('out-full').innerText = lastGeneratedYaml;
-        statusMsg.innerText = \`✅ 配置文件生成成功！\`;
+        statusMsg.innerText = "✅ 配置文件生成成功！";
 
         if (autoDownload) {
             await downloadYaml();
