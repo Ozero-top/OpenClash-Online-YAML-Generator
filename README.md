@@ -34,12 +34,27 @@
 ## Cloudflare部署方式
 
 ### 1. 环境准备与部署指南
-#### 部署至 Cloudflare Workers
-1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)。
-2. 进入 **Workers & Pages** -> 点击 **Create Application** -> **Start with Hello World**。
-3. 命名 Worker 并点击 **Deploy**。
-4. 点击 **Edit code**，清空左侧输入框默认代码，将整个 JS 文件内容完整粘贴进入。
-5. 点击 **Save and deploy** 即可完成部署。访问 Cloudflare 分配的 `*.workers.dev` 域名即可使用。
+
+#### 部署至 Cloudflare Workers /登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)。
+
+#### 第一步：创建 KV 命名空间
+#### 登录 Cloudflare 控制台。
+#### 在左侧菜单栏找到 存储和数据库 (Storage & Databases) -> 选择 KV。
+#### 点击 创建命名空间 (Create a Namespace)。
+#### 在命名空间名称框输入：VISIT_COUNTER_KV（或任意你喜欢的名称），点击 添加 (Add)。
+
+#### 第二步：部署代码到 Worker
+#### 进入 Worker 和 Pages (Workers & Pages) -> 选择你的 Worker 应用（或新建一个 Worker）。
+#### 点击 编辑代码 (Edit code)，将完整代码粘贴进去，点击 保存并部署 (Save and deploy)。
+
+#### 第三步：绑定 KV 命名空间到 Worker
+#### 返回该 Worker 的管理页面，进入 设置 (Settings) 选项卡。
+#### 在侧边栏选择 变量 (Variables)（或“环境变量/绑定”）。
+#### 找到 KV 命名空间绑定 (KV Namespace Bindings) 区域，点击 添加绑定 (Add binding)。
+#### 填写配置项：
+#### 变量名称 (Variable name)：必须填 VISIT_COUNTER （代码中使用该名称调用）。
+#### KV 命名空间 (KV namespace)：选择第一步创建的 VISIT_COUNTER_KV。
+#### 点击 保存并部署 (Save and deploy)。
 
 ### 2. 用户操作指引
 #### 场景 A：配置链式代理（中转 + 静态住宅 IP 落地）
