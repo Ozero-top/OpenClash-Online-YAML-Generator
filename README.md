@@ -53,7 +53,7 @@
 6. 点击 **🚀 生成并自动下载完整 YAML 文件**。
 7. clash运行该yaml文件后，无需任何设置即可按照前面 **网段匹配** 或 **指定设备单 IP** 配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的 **所有 - 手动** 选择延时最低节点作为前置中转
 8. 其他策略组对 **网段匹配** 或 **指定设备单 IP** 无任何影响；仅作用于 OpenWRT软路由 非 **网段匹配** 或 **指定设备单 IP** 的设备；可自动分流，WebRTC/DNS防泄漏
-  （分流/防泄漏前提要自行配置clash插件 或 替换clash插件配置文件，具体操作可参考：[使用指南](https://github.com/Ozero-top/OpenClash-Config/blob/main/README.md) - 【替换OpenClash插件配置文件】 操作说明 )
+  （分流/防泄漏前提要自行配置clash插件 或 替换clash插件配置文件，具体操作可参考：[使用指南](https://github.com/Ozero-top/OpenClash-Config/blob/main/OpenClash%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.md) - 【替换OpenClash插件配置文件】 操作说明 )
 
 
 #### 场景 B：配置家用自动分流模式（单/双订阅）
@@ -61,7 +61,7 @@
 2. 输入主力机场订阅地址；若有备用机场，勾选 **启用备用代理聚合** 并填入备用订阅地址。
 3. 点击 **🚀 生成并自动下载完整 YAML 文件**。
 4. clash运行该yaml文件后，可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组，根据使用需求自行设置；除 直连、拒绝 策略组，其他策略组均是自动切换最低延时节点；可手动选择，但会在3-6小时后自动切换到延时最低节点
-5. 分流/防泄漏前提要自行配置clash插件 或 替换clash插件配置文件，具体操作可参考：[使用指南](https://github.com/Ozero-top/OpenClash-Config/blob/main/README.md) - 【替换OpenClash插件配置文件】 操作说明 
+5. 分流/防泄漏前提要自行配置clash插件 或 替换clash插件配置文件，具体操作可参考：[使用指南](https://github.com/Ozero-top/OpenClash-Config/blob/main/OpenClash%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.md) - 【替换OpenClash插件配置文件】 操作说明 
 
 #### 场景 C：Socks5 / SK 格式转换
 1. 选择 **🛠️ Socks5 / SK 格式转换** 模式。
