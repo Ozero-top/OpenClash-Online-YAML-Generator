@@ -1,6 +1,22 @@
 // Cloudflare Worker 部署入口
 export default {
   async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    // 排除静态资源/图标等请求的计数，仅针对页面主路由
+    let pageViews = 0;
+    if (env.VISIT_COUNTER) {
+      try {
+        // 从 Cloudflare KV 读取当前访问量
+        const count = await env.VISIT_COUNTER.get("page_views");
+        pageViews = count ? parseInt(count, 10) + 1 : 1;
+        // 异步更新 KV（不阻塞页面加载性能）
+        ctx.waitUntil(env.VISIT_COUNTER.put("page_views", pageViews.toString()));
+      } catch (err) {
+        console.error("KV 计数读写失败:", err);
+      }
+    }
+
     const html = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -61,6 +77,10 @@ export default {
         
         .mode-section { display: none; }
         .mode-section.active-section { display: block; }
+
+        /* 页脚访问计数器样式 */
+        .footer-counter { margin-top: 35px; padding-top: 15px; border-top: 1px dashed #dadce0; text-align: center; font-size: 12px; color: #5f6368; }
+        .footer-counter .count-badge { background: #e8f0fe; color: #1a73e8; font-weight: bold; padding: 2px 8px; border-radius: 12px; margin-left: 4px; }
     </style>
 </head>
 <body>
@@ -238,6 +258,11 @@ export default {
             <div class="section-title">📄 完整 YAML 预览区</div>
         </div>
         <div id="out-full" class="output-box">点击生成按钮后查看...</div>
+    </div>
+
+    <!-- 底部访问计数器展示 -->
+    <div class="footer-counter">
+        👀 本页累计访问量：<span class="count-badge">${pageViews}</span> 次
     </div>
 </div>
 
@@ -591,112 +616,10 @@ function clearBulkText() {
     document.getElementById('bulkLinks').value = "";
 }
 
-function parseVless(link) {
-    const url = new URL(link);
-    const params = new URLSearchParams(url.search);
-    const proxy = { name: "", type: "vless", server: url.hostname, port: parseInt(url.port || "443", 10), uuid: url.username, udp: true };
-    if (params.get('flow')) proxy.flow = params.get('flow');
-    const security = params.get('security') || 'none';
-    if (security === 'tls' || security === 'reality') {
-        proxy.tls = true;
-        const sni = params.get('sni') || params.get('host');
-        if (sni) proxy.servername = sni;
-        if (params.get('fp')) proxy['client-fingerprint'] = params.get('fp');
-    }
-    if (security === 'reality') {
-        proxy['reality-opts'] = {};
-        if (params.get('pbk')) proxy['reality-opts']['public-key'] = params.get('pbk');
-        if (params.get('sid')) proxy['reality-opts']['short-id'] = params.get('sid');
-    }
-    const type = params.get('type') || 'tcp';
-    if (type === 'ws') {
-        proxy.network = 'ws';
-        proxy['ws-opts'] = {};
-        if (params.get('path')) proxy['ws-opts'].path = params.get('path');
-        if (params.get('host')) proxy['ws-opts'].headers = { Host: params.get('host') };
-    } else if (type === 'grpc') {
-        proxy.network = 'grpc';
-        proxy['grpc-opts'] = {};
-        const serviceName = params.get('serviceName') || params.get('servicename');
-        if (serviceName) proxy['grpc-opts']['grpc-service-name'] = serviceName;
-    }
-    return proxy;
-}
-
-function parseVmess(link) {
-    const b64 = link.replace('vmess://', '');
-    const jsonStr = decodeBase64Utf8(b64);
-    const vmess = JSON.parse(jsonStr);
-    const proxy = { name: "", type: 'vmess', server: vmess.add, port: parseInt(vmess.port, 10), uuid: vmess.id, alterId: parseInt(vmess.aid || '0', 10), cipher: vmess.scy || 'auto', udp: true };
-    if (vmess.tls === 'tls') { proxy.tls = true; if (vmess.sni) proxy.servername = vmess.sni; }
-    const net = vmess.net || 'tcp';
-    if (net === 'ws') {
-        proxy.network = 'ws';
-        proxy['ws-opts'] = {};
-        if (vmess.path) proxy['ws-opts'].path = vmess.path;
-        if (vmess.host) proxy['ws-opts'].headers = { Host: vmess.host };
-    } else if (net === 'grpc') {
-        proxy.network = 'grpc';
-        proxy['grpc-opts'] = {};
-        if (vmess.path) proxy['grpc-opts']['grpc-service-name'] = vmess.path;
-    }
-    return proxy;
-}
-
-function parseTrojan(link) {
-    const raw = link.replace('trojan-go://', 'trojan://');
-    const url = new URL(raw);
-    const params = new URLSearchParams(url.search);
-    const proxy = { name: "", type: 'trojan', server: url.hostname, port: parseInt(url.port || '443', 10), password: url.username, udp: true };
-    if (params.get('sni') || params.get('peer')) proxy.sni = params.get('sni') || params.get('peer');
-    if (params.get('type') === 'ws') {
-        proxy.network = 'ws';
-        proxy['ws-opts'] = {};
-        if (params.get('path')) proxy['ws-opts'].path = params.get('path');
-        if (params.get('host')) proxy['ws-opts'].headers = { Host: params.get('host') };
-    }
-    return proxy;
-}
-
-function parseHysteria2(link) {
-    const raw = link.replace('hy2://', 'hysteria2://');
-    const url = new URL(raw);
-    const params = new URLSearchParams(url.search);
-    const proxy = { name: "", type: 'hysteria2', server: url.hostname, port: parseInt(url.port || '443', 10), auth: url.username || url.password, up: "100 Mbps", down: "500 Mbps" };
-    if (params.get('sni')) proxy.sni = params.get('sni');
-    if (params.get('obfs')) {
-        proxy.obfs = params.get('obfs');
-        if (params.get('obfs-password')) proxy['obfs-password'] = params.get('obfs-password');
-    }
-    return proxy;
-}
-
-function parseSocks5(link) {
-    const url = new URL(link);
-    const proxy = { name: "", type: 'socks5', server: url.hostname, port: parseInt(url.port || '1080', 10), udp: true };
-    if (url.username) proxy.username = url.username;
-    if (url.password) proxy.password = url.password;
-    return proxy;
-}
-
 function decodeBase64Utf8(str) {
     str = str.replace(/-/g, '+').replace(/_/g, '/');
     while (str.length % 4) str += '=';
     return decodeURIComponent(atob(str).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-}
-
-function formatInlineYaml(obj) {
-    const parts = [];
-    for (const [key, val] of Object.entries(obj)) {
-        if (typeof val === 'object' && val !== null) {
-            parts.push(key + ': ' + formatInlineYaml(val));
-        } else if (typeof val === 'boolean' || typeof val === 'number') {
-            parts.push(key + ': ' + val);
-        } else {
-            parts.push(key + ': "' + val + '"');
-        }
-    }
-    return '{' + parts.join(', ') + '}';
 }
 
 async function downloadYaml() {
