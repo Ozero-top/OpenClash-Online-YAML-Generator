@@ -3,15 +3,30 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // 排除静态资源/图标等请求的计数，仅针对页面主路由
+    // 获取当前访客的真实 IP（仅用于展示访客自身及去重计算）
+    const clientIP = request.headers.get("cf-connecting-ip") || "127.0.0.1";
+
     let pageViews = 0;
     if (env.VISIT_COUNTER) {
       try {
-        // 从 Cloudflare KV 读取当前访问量
+        // 1. 从 Cloudflare KV 读取当前全局去重总访问量
         const count = await env.VISIT_COUNTER.get("page_views");
-        pageViews = count ? parseInt(count, 10) + 1 : 1;
-        // 异步更新 KV（不阻塞页面加载性能）
-        ctx.waitUntil(env.VISIT_COUNTER.put("page_views", pageViews.toString()));
+        pageViews = count ? parseInt(count, 10) : 0;
+
+        // 2. 检查当前访客 IP 是否曾访问过
+        const hasVisited = await env.VISIT_COUNTER.get(`ip:${clientIP}`);
+
+        if (!hasVisited) {
+          // 若为新 IP，总计数 +1
+          pageViews += 1;
+          // 3. 异步标记该 IP 并更新总访问量（不阻塞页面加载性能）
+          ctx.waitUntil(
+            Promise.all([
+              env.VISIT_COUNTER.put(`ip:${clientIP}`, "true"),
+              env.VISIT_COUNTER.put("page_views", pageViews.toString())
+            ])
+          );
+        }
       } catch (err) {
         console.error("KV 计数读写失败:", err);
       }
@@ -80,7 +95,7 @@ export default {
 
         /* 页脚访问计数器样式 */
         .footer-counter { margin-top: 35px; padding-top: 15px; border-top: 1px dashed #dadce0; text-align: center; font-size: 12px; color: #5f6368; }
-        .footer-counter .count-badge { background: #e8f0fe; color: #1a73e8; font-weight: bold; padding: 2px 8px; border-radius: 12px; margin-left: 4px; }
+        .footer-counter .count-badge { background: #e8f0fe; color: #1a73e8; font-weight: bold; padding: 2px 8px; border-radius: 12px; margin: 0 4px; }
     </style>
 </head>
 <body>
@@ -260,9 +275,9 @@ export default {
         <div id="out-full" class="output-box">点击生成按钮后查看...</div>
     </div>
 
-    <!-- 底部访问计数器展示 -->
+    <!-- 底部访问计数器与仅针对当前访客的 IP 展示 -->
     <div class="footer-counter">
-        👀 本页累计访问量：<span class="count-badge">${pageViews}</span> 次
+        🌐 您的当前 IP：<span class="count-badge">${clientIP}</span> &nbsp;|&nbsp; 👀 累计访问量(UV)：<span class="count-badge">${pageViews}</span> 次
     </div>
 </div>
 
@@ -274,9 +289,9 @@ let currentMode = "chain-single";
 const guideLink = '<a href="https://github.com/Ozero-top/OpenClash-Config/blob/main/README.md" target="_blank" rel="noopener noreferrer">使用指南</a>';
 
 const modeDescriptions = {
-    'chain-single': '🔲 链式代理 - 独立节点输入模式：允许用户通过独立的表单卡片逐个输入或粘贴前置中转代理节点，支持为每个节点单独指定或自动识别国家/地区标签，并结合网段或指定单 IP 进行精准分流。<br>⚠️ clash运行该yaml文件后，无需任何设置即可按照前面 【网段匹配】 或 【指定设备单 IP】配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的【所有 - 手动】选择延时最低节点作为前置中转；其他策略组对 【网段匹配】 或 【指定设备单 IP】 无任何影响；仅作用于 OpenWRT软路由 非 【网段匹配】 或 【指定设备单 IP】 的设备；可自动分流，WebRTC/DNS防泄漏（分流/防泄漏前提要自行配置clash插件 或 本页面右上角下载clash插件配置文件替换，具体操作可参考：[' + guideLink + '] 的操作说明 - 【替换OpenClash插件配置文件】 )',
-    'chain-bulk': '📑 链式代理 - 批量混合粘贴模式：支持在多行文本框中批量粘贴多种协议的节点链接（如 vless、vmess、trojan、hysteria2、socks5），系统会自动解析并批量匹配国家/地区，快速生成链式代理配置文件。<br>⚠️ clash运行该yaml文件后，无需任何设置即可按照前面 【网段匹配】 或 【指定设备单 IP】配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的【所有 - 手动】选择延时最低节点作为前置中转；其他策略组对 【网段匹配】 或 【指定设备单 IP】 无任何影响；仅作用于 OpenWRT软路由 非 【网段匹配】 或 【指定设备单 IP】 的设备；可自动分流，WebRTC/DNS防泄漏（分流/防泄漏前提要自行配置clash插件 或 本页面右上角下载clash插件配置文件替换，具体操作可参考：[' + guideLink + '] 的操作说明 - 【替换OpenClash插件配置文件】 )',
-    'standard': '🌐 自动分流 - 单/双代理订阅家用模式 (V0.2.5)：面向日常或家用场景，支持配置单机场或双机场（主力+备用）订阅地址，自动聚合节点并提供全自动区域流控、延迟优化与丰富的主流分流规则。同时兼顾DNS防泄漏和WebRTC防泄漏。<br>⚠️ clash运行该yaml文件后，可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组，根据使用需求自行设置；除 直连、拒绝 策略组，其他策略组均是自动切换最低延时节点；可手动选择，但会在3-6小时后自动切换到延时最低节点；分流/防泄漏前提要自行配置clash插件 或 本页面右上角下载clash插件配置文件替换，具体操作可参考：[' + guideLink + ']的操作说明 - 【替换OpenClash插件配置文件】',
+    'chain-single': '🔲 链式代理 - 独立节点输入模式：允许用户通过独立的表单卡片逐个输入或粘贴前置中转代理节点，支持为每个节点单独指定或自动识别国家/地区标签，并结合网段或指定单 IP 进行精准分流。<br>⚠️ clash运行该yaml文件后，无需任何设置即可按照前面 【网段匹配】 或 【指定设备单 IP】配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的【所有 - 手动】选择延时最低节点作为前置中转；其他策略组对 【网段匹配】 或 【指定设备单 IP】 无任何影响；仅作用于 OpenWRT软路由 非 【网段匹配】 或 【指定设备单 IP】 的设备；可自动分流，WebRTC/DNS防泄漏（分流/防泄漏前提要自行配置clash插件 或 页面右上角下载clash插件配置文件替换，具体操作可参考：[' + guideLink + '] 的操作说明 - 【替换OpenClash插件配置文件】 )',
+    'chain-bulk': '📑 链式代理 - 批量混合粘贴模式：支持在多行文本框中批量粘贴多种协议的节点链接（如 vless、vmess、trojan、hysteria2、socks5），系统会自动解析并批量匹配国家/地区，快速生成链式代理配置文件。<br>⚠️ clash运行该yaml文件后，无需任何设置即可按照前面 【网段匹配】 或 【指定设备单 IP】配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的【所有 - 手动】选择延时最低节点作为前置中转；其他策略组对 【网段匹配】 或 【指定设备单 IP】 无任何影响；仅作用于 OpenWRT软路由 非 【网段匹配】 或 【指定设备单 IP】 的设备；可自动分流，WebRTC/DNS防泄漏（分流/防泄漏前提要自行配置clash插件 或 页面右上角下载clash插件配置文件替换，具体操作可参考：[' + guideLink + '] 的操作说明 - 【替换OpenClash插件配置文件】 )',
+    'standard': '🌐 自动分流 - 单/双代理订阅家用模式 (V0.2.5)：面向日常或家用场景，支持配置单机场或双机场（主力+备用）订阅地址，自动聚合节点并提供全自动区域流控、延迟优化与丰富的主流分流规则。同时兼顾DNS防泄漏和WebRTC防泄漏。<br>⚠️ clash运行该yaml文件后，可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组，根据使用需求自行设置；除 直连、拒绝 策略组，其他策略组均是自动切换最低延时节点；可手动选择，但会在3-6小时后自动切换到延时最低节点；分流/防泄漏前提要自行配置clash插件 或 页面右上角下载clash插件配置文件替换，具体操作可参考：[' + guideLink + ']的操作说明 - 【替换OpenClash插件配置文件】',
     'sk-convert': '🛠️ Socks5 / SK 格式转换工具：提供独立的格式批量转换服务，将“IP|端口|账号|密码”格式转换为标准的 socks5:// 协议链接。转换结果可直接复制，用于链式代理或其他代理软件。'
 };
 
