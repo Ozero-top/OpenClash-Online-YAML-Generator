@@ -52,7 +52,7 @@
 #### 在侧边栏选择 变量 (Variables)（或“环境变量/绑定”）。
 #### 找到 KV 命名空间绑定 (KV Namespace Bindings) 区域，点击 添加绑定 (Add binding)。
 #### 填写配置项：
-#### 变量名称 (Variable name)：必须填 VISIT_COUNTER （代码中使用该名称调用）。
+#### 变量名称 (Variable name)：必须填 PAGE_VISITS （代码中使用该名称调用）。
 #### KV 命名空间 (KV namespace)：选择第一步创建的 VISIT_COUNTER_KV。
 #### 点击 保存并部署 (Save and deploy)。
 
