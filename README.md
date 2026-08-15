@@ -1,5 +1,5 @@
 # OpenClash YAML运行配置文件 在线生成工具
-![image](https://raw.githubusercontent.com/Ozero-top/OpenClash-Online-YAML-Generator/e186374986f00f39fe8ed7b5cb2a654bb2a12c62/Interface%20Preview.png)
+![image](https://raw.githubusercontent.com/Ozero-top/OpenClash-Online-YAML-Generator/refs/heads/main/OpenClash-Online-YAML-Generator.png)
 ## [在线演示地址](https://clash.ovitor.asia/)
 这是一个基于 OpenClash 的运行配置文件一键生成工具。支持自适应解析多种订阅及节点协议，轻松将住宅 IP 作为落地节点、代理订阅作为前置中转，实现指定网段或单设备的精准分流，免去手动配置复杂的协议参数与 IP 规则。
 
