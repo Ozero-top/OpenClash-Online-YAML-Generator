@@ -3,7 +3,7 @@
 ## [在线演示地址](https://clash.ovitor.asia/)
 
 ### 支持客户端 ：
-### [OpenClash](https://github.com/vernesong/OpenClash) OpenWRT插件  /  [ClashMI](https://clashmi.app/) 多设备客户端
+* [OpenClash](https://github.com/vernesong/OpenClash) -> `OpenWRT插件`  /  [ClashMI](https://clashmi.app/) `多设备客户端`
 
 ##
 这是一个面向 OpenClash 与 OpenWrt 用户的综合配置、节点解析与网络分流工具，支持自动分流、链式代理、单 IP/网段精准分流、节点批量导入及国家/地区智能识别，兼容 VLESS、VMess、Trojan、Hysteria2、Socks5 等协议；支持订阅配置、YAML 自动生成、在线预览与下载，并集成 DNS/TUN 防泄漏、策略组、IPv4/IPv6、DoH 解析、节点地理查询、访问统计、Worker API 等功能，适用于家庭网络、软路由、游戏加速及多节点代理场景。同时提供多种配置模式、节点地区判断与代理链路组合能力，方便用户快速生成可直接用于 OpenClash 的完整配置文件。
