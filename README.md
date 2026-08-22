@@ -1,5 +1,4 @@
 # OpenClash YAML运行配置文件 在线生成工具
-![image](https://raw.githubusercontent.com/Ozero-top/OpenClash-Online-YAML-Generator/refs/heads/main/OpenClash-Online-YAML-Generator.png)
 
 ## [在线演示地址](https://clash.ovitor.asia/)
 
@@ -144,3 +143,4 @@
 * **`formatInlineYaml` 算法**：将 JS 节点对象转换为 Clash 要求的内联 YAML 格式字符串（例如 `{name: "节点", type: "socks5", server: "1.1.1.1", ...}`）。
 * **链式代理逻辑（Chain Proxy / Dialer-Proxy）**：为住宅 IP 落地节点注入 `dialer-proxy` 属性，将其前置中转流量指定给机场订阅策略组（如 `所有-自动` 或 `所有-手动`），并动态生成 `SRC-IP-CIDR` 分流规则与独立的策略组。
 
+![image](https://raw.githubusercontent.com/Ozero-top/OpenClash-Online-YAML-Generator/refs/heads/main/OpenClash-Online-YAML-Generator.png)
