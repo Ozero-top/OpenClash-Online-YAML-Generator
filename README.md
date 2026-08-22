@@ -143,4 +143,8 @@
 * **`formatInlineYaml` 算法**：将 JS 节点对象转换为 Clash 要求的内联 YAML 格式字符串（例如 `{name: "节点", type: "socks5", server: "1.1.1.1", ...}`）。
 * **链式代理逻辑（Chain Proxy / Dialer-Proxy）**：为住宅 IP 落地节点注入 `dialer-proxy` 属性，将其前置中转流量指定给机场订阅策略组（如 `所有-自动` 或 `所有-手动`），并动态生成 `SRC-IP-CIDR` 分流规则与独立的策略组。
 
+# 致谢
+* ### [【liandu2024】](https://github.com/liandu2024/clash) 提供Yaml源码文件
+* ### Clash / Mihomo / sing-box 生态项目与规则集作者 
+
 ![image](https://raw.githubusercontent.com/Ozero-top/OpenClash-Online-YAML-Generator/refs/heads/main/OpenClash-Online-YAML-Generator.png)
