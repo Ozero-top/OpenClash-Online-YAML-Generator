@@ -1921,7 +1921,7 @@ function trackAction(actionName, extra) { /* no-op */ }
     </div>
 
     <div class="btn-group" id="clashBtnGroup">
-        <button class="btn-main" onclick="generateYaml(true)">🚀 生成并自动下载完整YAML文件</button>
+        <button class="btn-main" onclick="generateYaml(true)">🚀 生成并自动下载完整YAML规则文件</button>
         <button class="btn-refresh" onclick="reloadPage()">🔄 刷新网页重置</button>
         <button class="btn-sub" onclick="downloadYaml()">💾 直接另存为 config.yaml</button>
     </div>
@@ -1929,7 +1929,7 @@ function trackAction(actionName, extra) { /* no-op */ }
     <div id="statusMsg" class="status"></div>
 
     <div id="clashOutputSection">
-        <div class="section-title" style="margin-top:20px; margin-bottom:8px;">📄 完整 YAML 预览区</div>
+        <div class="section-title" style="margin-top:20px; margin-bottom:8px;">📄 完整 YAML 规则预览区</div>
         <div id="out-full" class="output-box">点击生成按钮后查看...</div>
     </div>
 </div>
@@ -2037,10 +2037,10 @@ const guideLinkHtml = \`<a href="\${guideUrl}" target="_blank" rel="noopener nor
 
 const modeDescriptions = {
     'chain-single': \`🔲 链式代理 - 独立节点输入模式：允许用户通过独立的表单卡片逐个输入或粘贴前置中转代理节点，支持为每个节点单独指定或自动识别国家/地区标签，并结合网段或指定单 IP 进行精准分流。&#10;⚠️ 注意：clash运行该yaml文件后，无需任何设置即可按照前面 网段匹配 或 指定设备单 IP 配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的 所有 - 手动 选择延时最低节点作为前置中转；其他策略组对 网段匹配 或 指定设备单 IP 无任何影响；仅作用于 OpenWRT软路由 非 网段匹配 或 指定设备单 IP 的设备；可自动分流，WebRTC/DNS防泄漏 （分流/防泄漏前提要自行配置clash插件 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明 )\`,
-    'chain-bulk': \`📑 链式代理 - 批量混合粘贴模式：支持在多行文本框中批量粘贴多种协议的节点链接（如 vless、vmess、trojan、hysteria2、socks5），系统会自动解析并批量匹配国家/地区，快速生成链式代理配置文件。&#10;⚠️ 注意：clash运行该yaml文件后，无需任何设置即可按照前面 网段匹配 或 指定设备单 IP 配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的 所有 - 手动 选择延时最低节点作为前置中转；其他策略组对 网段匹配 或 指定设备单 IP 无任何影响；仅作用于 OpenWRT软路由 非 网段匹配 或 指定设备单 IP 的设备；可自动分流，WebRTC/DNS防泄漏 （分流/防泄漏前提要自行配置clash插件 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明 )\`,
-    'standard': \`🌐 自动分流 - 单/双代理订阅家用模式 (V0.2.5)：面向日常或家用场景，支持配置单代理或双代理（主力+备用）订阅地址，自动聚合节点并提供全自动区域流控、延迟优化与丰富的主流分流规则。同时兼顾DNS防泄漏和WebRTC防泄漏。&#10;⚠️ 注意：clash运行该yaml文件后，可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组，根据使用需求自行设置；除 直连、拒绝 策略组，其他策略组均是自动切换最低延时节点；可手动选择，但会在3-6小时后自动切换到延时最低节点。【分流/防泄漏前提要自行配置clash插件】 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明\`,
+    'chain-bulk': \`📑 链式代理 - 批量混合粘贴模式：支持在多行文本框中批量粘贴多种协议的节点链接（如 vless、vmess、trojan、hysteria2、socks5），系统会自动解析并批量匹配国家/地区，快速生成链式代理配置文件。&#10;⚠️ 注意：clash运行该yaml规则文件后，无需任何设置即可按照前面 网段匹配 或 指定设备单 IP 配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的 所有 - 手动 选择延时最低节点作为前置中转；其他策略组对 网段匹配 或 指定设备单 IP 无任何影响；仅作用于 OpenWRT软路由 非 网段匹配 或 指定设备单 IP 的设备；可自动分流，WebRTC/DNS防泄漏 （分流/防泄漏前提要自行配置clash插件 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明 )\`,
+    'standard': \`🌐 自动分流 - 单/双代理订阅家用模式 (V0.2.5)：面向日常或家用场景，支持配置单代理或双代理（主力+备用）订阅地址，自动聚合节点并提供全自动区域流控、延迟优化与丰富的主流分流规则。同时兼顾DNS防泄漏和WebRTC防泄漏。&#10;⚠️ 注意：clash运行该yaml规则文件后，可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组，根据使用需求自行设置；除 直连、拒绝 策略组，其他策略组均是自动切换最低延时节点；可手动选择，但会在3-6小时后自动切换到延时最低节点。【分流/防泄漏前提要自行配置clash插件】 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明\`,
     'sk-convert': '🛠️ Socks5 / SK 格式转换工具：提供独立的格式批量转换服务，将"IP|端口|账号|密码"格式转换为标准的 socks5:// 协议链接。转换结果可直接复制，用于链式代理或其他代理软件。',
-    'direct': \`🎯 直连模式 - 网段/单IP精准分流 (无中转/无链式)：<span class="highlight-badge">此模式适合: 国内外电商/游戏/直播使用</span> 仅需要输入节点链接并选择网段匹配或指定设备单 IP，系统自动生成 YAML 配置文件。不需要前置中转代理订阅，也不使用链式代理 (dialer-proxy)，节点直接作为代理出口，配合 SRC-IP-CIDR 规则实现指定网段或设备的精准分流。&#10;⚠️ 注意：clash运行该yaml文件后，无需任何设置即可按照 网段匹配 或 指定设备单 IP 配置自动运行（默认全局）\`
+    'direct': \`🎯 直连模式 - 网段/单IP精准分流 (无中转/无链式)：<span class="highlight-badge">此模式适合: 国内外电商/游戏/直播使用</span> 仅需要输入节点链接并选择网段匹配或指定设备单 IP，系统自动生成 YAML 配置文件。不需要前置中转代理订阅，也不使用链式代理 (dialer-proxy)，节点直接作为代理出口，配合 SRC-IP-CIDR 规则实现指定网段或设备的精准分流。&#10;⚠️ 注意：clash运行该yaml规则文件后，无需任何设置即可按照 网段匹配 或 指定设备单 IP 配置自动运行（默认全局）\`
 };
 
 const countryCodeToCn = {
