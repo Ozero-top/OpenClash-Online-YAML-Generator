@@ -1,4 +1,4 @@
-# OpenClash YAML 规则文件一键生成工具
+# OpenClash YAML 规则文件一键生成工具(测试版)
 
 ## [Test-在线演示地址](https://clash.ovitor.asia/)
 
