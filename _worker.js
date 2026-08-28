@@ -1156,7 +1156,7 @@ function trackAction(actionName, extra) { /* no-op */ }
 <html lang="zh-CN">
 <head>
     ${SHARED_HEAD_META}
-    <title> OpenClash YAML配置文件一键生成工具 </title>
+    <title> OpenClash YAML规则文件一键生成工具 </title>
     <style>
         :root {
             --bg-color: #0f1419;
@@ -1767,7 +1767,7 @@ function trackAction(actionName, extra) { /* no-op */ }
     </div>
 
     <div class="header-title-container">
-        <h2>⚡ OpenClash YAML配置文件一键生成工具</h2>
+        <h2>⚡ OpenClash YAML规则文件一键生成工具</h2>
         <div class="header-right-tools">
             <button type="button" id="themeToggleBtn" class="theme-toggle-btn" title="切换浅色/深色主题">🌙</button>
             <div class="ip-stats-badge" id="ipStatsBadge">
