@@ -1,7 +1,7 @@
 # OpenClash YAML 规则文件一键生成工具
 
-## [在线演示地址](https://clash.ovitor.asia/)
-
+## [正式版-在线演示地址](https://clash.ovitor.asia/)
+## [测试版-在线演示地址](https://test.ovitor.asia/)
 ### 支持客户端 ：
 * [OpenClash](https://github.com/vernesong/OpenClash) -> `OpenWRT插件`  /  [ClashMI](https://clashmi.app/) `多设备客户端`
 
