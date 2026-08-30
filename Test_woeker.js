@@ -1156,7 +1156,7 @@ function trackAction(actionName, extra) { /* no-op */ }
 <html lang="zh-CN">
 <head>
     ${SHARED_HEAD_META}
-    <title> OpenClash YAML规则文件一键生成工具 </title>
+    <title> OpenClash YAML规则文件一键生成工具(测试版) </title>
     <style>
         :root {
             --bg-color: #0f1419;
@@ -1751,6 +1751,9 @@ function trackAction(actionName, extra) { /* no-op */ }
             🏠 首页
         </a>
         <div class="quick-links-right">
+            <a href="https://clash.ovitor.asia/" target="_blank" rel="noopener noreferrer" class="download-btn-link" onclick="trackAction('首页外链：规则生成工具主站（clash.ovitor.asia）'); return true;">
+                规则生成工具主站
+            </a>
             <a href="https://leak.ozero.asia/" target="_blank" rel="noopener noreferrer" class="download-btn-link" onclick="trackAction('首页外链：DNS/WebRTC 泄露检测工具（leak.ozero.asia）'); return true;">
                 DNS/WebRTC 泄露检测
             </a>
@@ -1767,7 +1770,7 @@ function trackAction(actionName, extra) { /* no-op */ }
     </div>
 
     <div class="header-title-container">
-        <h2>⚡ OpenClash YAML规则文件一键生成工具</h2>
+        <h2>⚡ OpenClash YAML规则文件一键生成工具(测试版)</h2>
         <div class="header-right-tools">
             <button type="button" id="themeToggleBtn" class="theme-toggle-btn" title="切换浅色/深色主题">🌙</button>
             <div class="ip-stats-badge" id="ipStatsBadge">
@@ -1822,13 +1825,15 @@ function trackAction(actionName, extra) { /* no-op */ }
             <div id="dialerProxyBlock">
                 <label for="dialerProxy">前置中转策略组 (dialer-proxy):</label>
                 <select id="dialerProxy">
-                    <option value="♻️ 自动选择" selected>♻️ 自动选择</option>
-                    <option value="🇭🇰 香港节点">🇭🇰 香港节点</option>
-                    <option value="🇺🇸 美国节点">🇺🇸 美国节点</option>
-                    <option value="🇯🇵 日本节点">🇯🇵 日本节点</option>
-                    <option value="🇸🇬 新加坡节点">🇸🇬 新加坡节点</option>
-                    <option value="🇼🇸 台湾节点">🇼🇸 台湾节点</option>
-                    <option value="🇰🇷 韩国节点">🇰🇷 韩国节点</option>
+                    <option value="节点选择" selected>节点选择</option>
+                    <option value="自动选择">自动选择</option>
+                    <option value="香港节点">香港节点</option>
+                    <option value="台湾节点">台湾节点</option>
+                    <option value="日本节点">日本节点</option>
+                    <option value="新加坡节点">新加坡节点</option>
+                    <option value="韩国节点">韩国节点</option>
+                    <option value="美国节点">美国节点</option>
+                    <option value="英国节点">英国节点</option>
                 </select>
             </div>
         </div>
@@ -1967,7 +1972,7 @@ const YAML_DNS_BLOCK = \`dns:
   ipv6: true
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
-  respect-rules: true 
+  respect-rules: true # 强制 DNS 解析遵从后方分流规则
   fake-ip-filter-mode: blacklist
   fake-ip-filter:
     - +.lan
@@ -2040,11 +2045,11 @@ const guideUrl = "https://github.com/Ozero-top/OpenClash-Config/blob/main/OpenCl
 const guideLinkHtml = \`<a href="\${guideUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: underline;">使用指南</a>\`;
 
 const modeDescriptions = {
-    'chain-single': \`🔲 链式代理 - 独立节点输入模式：允许用户通过独立的表单卡片逐个输入或粘贴前置中转代理节点，支持为每个节点单独指定或自动识别国家/地区标签，并结合网段或指定单 IP 进行精准分流。&#10;⚠️ 注意：clash运行该yaml文件后，无需任何设置即可按照前面 网段匹配 或 指定设备单 IP 配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的 所有 - 手动 选择延时最低节点作为前置中转；其他策略组对 网段匹配 或 指定设备单 IP 无任何影响；仅作用于 OpenWRT软路由 非 网段匹配 或 指定设备单 IP 的设备；可自动分流，WebRTC/DNS防泄漏 （分流/防泄漏前提要自行配置clash插件 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明 )\`,
-    'chain-bulk': \`📑 链式代理 - 批量混合粘贴模式：支持在多行文本框中批量粘贴多种协议的节点链接（如 vless、vmess、trojan、hysteria2、socks5），系统会自动解析并批量匹配国家/地区，快速生成链式代理配置文件。&#10;⚠️ 注意：clash运行该yaml规则文件后，无需任何设置即可按照前面 网段匹配 或 指定设备单 IP 配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的 所有 - 手动 选择延时最低节点作为前置中转；其他策略组对 网段匹配 或 指定设备单 IP 无任何影响；仅作用于 OpenWRT软路由 非 网段匹配 或 指定设备单 IP 的设备；可自动分流，WebRTC/DNS防泄漏 （分流/防泄漏前提要自行配置clash插件 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明 )\`,
-    'standard': \`🌐 自动分流 - 单/双代理订阅家用模式 (V0.2.5)：面向日常或家用场景，支持配置单代理或双代理（主力+备用）订阅地址，自动聚合节点并提供全自动区域流控、延迟优化与丰富的主流分流规则。同时兼顾DNS防泄漏和WebRTC防泄漏。&#10;⚠️ 注意：clash运行该yaml规则文件后，可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组，根据使用需求自行设置；除 直连、拒绝 策略组，其他策略组均是自动切换最低延时节点；可手动选择，但会在3-6小时后自动切换到延时最低节点。【分流/防泄漏前提要自行配置clash插件】 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明\`,
+    'chain-single': \`🔲 链式代理 - 独立节点输入模式：允许用户通过独立的表单卡片逐个输入或粘贴前置中转代理节点，支持为每个节点单独指定或自动识别国家/地区标签；前置中转策略组已升级为 10 选项，并结合网段或指定单 IP 进行 SRC-IP-CIDR 精准分流。生成的 YAML 为 34 组新策略组结构，并保留链式特有的「纯静态住宅-落地组」与 WiFi 分组、WebRTC/DNS 防泄漏。&#10;⚠️ 注意：clash运行该yaml文件后，无需任何设置即可按照前面 网段匹配 或 指定设备单 IP 配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的 所有 - 手动 选择延时最低节点作为前置中转；其他策略组对 网段匹配 或 指定设备单 IP 无任何影响；仅作用于 OpenWRT软路由 非 网段匹配 或 指定设备单 IP 的设备；可自动分流，WebRTC/DNS防泄漏 （分流/防泄漏前提要自行配置clash插件 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明 )\`,
+    'chain-bulk': \`📑 链式代理 - 批量混合粘贴模式：支持在多行文本框中批量粘贴多种协议的节点链接（如 vless、vmess、trojan、hysteria2、socks5），系统会自动解析并批量匹配国家/地区；前置中转策略组已升级为 10 选项，快速生成 34 组新策略组结构的链式代理配置文件，并保留链式特有的「纯静态住宅-落地组」与 WiFi 分组、WebRTC/DNS 防泄漏。&#10;⚠️ 注意：clash运行该yaml规则文件后，无需任何设置即可按照前面 网段匹配 或 指定设备单 IP 配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的 所有 - 手动 选择延时最低节点作为前置中转；其他策略组对 网段匹配 或 指定设备单 IP 无任何影响；仅作用于 OpenWRT软路由 非 网段匹配 或 指定设备单 IP 的设备；可自动分流，WebRTC/DNS防泄漏 （分流/防泄漏前提要自行配置clash插件 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明 )\`,
+    'standard': \`🌐 自动分流 - 单/双代理订阅家用模式 (V0.2.6.1 生产环境测试版)：面向日常或家用场景，支持配置单代理或双代理（主力+备用）订阅地址，自动聚合节点并提供全自动区域流控、延迟优化与 34 组主流分流规则，全部 rule-providers 已内联属性（移除锚点/合并键引用）以兼容 OpenClash go-yaml 解析器，同时兼顾 DNS 防泄漏和 WebRTC 防泄漏。&#10;⚠️ 注意：clash运行该yaml规则文件后，可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组，根据使用需求自行设置；除 直连、拒绝 策略组，其他策略组均是自动切换最低延时节点；可手动选择，但会在3-6小时后自动切换到延时最低节点。【分流/防泄漏前提要自行配置clash插件】 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明\`,
     'sk-convert': '🛠️ Socks5 / SK 格式转换工具：提供独立的格式批量转换服务，将"IP|端口|账号|密码"格式转换为标准的 socks5:// 协议链接。转换结果可直接复制，用于链式代理或其他代理软件。',
-    'direct': \`🎯 直连模式 - 网段/单IP精准分流 (无中转/无链式)：<span class="highlight-badge">此模式适合: 国内外电商/游戏/直播使用</span> 仅需要输入节点链接并选择网段匹配或指定设备单 IP，系统自动生成 YAML 配置文件。不需要前置中转代理订阅，也不使用链式代理 (dialer-proxy)，节点直接作为代理出口，配合 SRC-IP-CIDR 规则实现指定网段或设备的精准分流。&#10;⚠️ 注意：clash运行该yaml规则文件后，无需任何设置即可按照 网段匹配 或 指定设备单 IP 配置自动运行（默认全局）\`
+    'direct': \`🎯 直连模式 - 网段/单IP精准分流 (无中转/无链式)：<span class="highlight-badge">此模式适合: 国内外电商/游戏/直播使用</span> 仅需要输入节点链接并选择网段匹配或指定设备单 IP，系统自动生成 YAML 配置文件。不需要前置中转代理订阅，也不使用链式代理 (dialer-proxy)，节点直接作为代理出口，配合 SRC-IP-CIDR 规则实现指定网段或设备的精准分流，并保留 WebRTC/DNS 防泄漏与常见金融/支付/政务/民生域名的 DIRECT 直连白名单。&#10;⚠️ 注意：clash运行该yaml规则文件后，无需任何设置即可按照 网段匹配 或 指定设备单 IP 配置自动运行（默认全局）\`
 };
 
 const countryCodeToCn = {
@@ -3586,807 +3591,830 @@ async function generateYaml(autoDownload = false) {
     url: "\${subUrl1}"
     type: http
     interval: 86400
-    exclude-filter: 流量|账号|剩余|到期|过期|测试|试用|TG|群|官网|Expire|APP|官方|异常|邮箱|防|卸载|@|距离     
+    exclude-filter: 流量|账号|剩余|到期|过期|测试|试用|TG|群|官网|Expire|APP|官方|异常|邮箱|防|卸载|@|距离|DIRECT|直接连接|邀请|返利|循环|客服|网站|网址|获取|订阅|下次|版本|官址|备用|已用|联系|工单|贩卖|倒卖|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|GB
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
       interval: 600
       timeout: 3000
       expected-status: 204
-      lazy: true\`;
-
-        let useProvidersForGroups = \`      - \${subName1}\`;
+      lazy: true  # 按需唤醒测速，显著降低软路由 CPU 占用\`;
 
         if (enableBackup) {
             proxyProvidersBlock += \`\\n\\n  \${subName2}:
     url: "\${subUrl2}"
     type: http
     interval: 86400
-    exclude-filter: 流量|账号|剩余|到期|过期|测试|试用|TG|群|官网|Expire|APP|官方|异常|邮箱|防|卸载|@|距离     
+    exclude-filter: 流量|账号|剩余|到期|过期|测试|试用|TG|群|官网|Expire|APP|官方|异常|邮箱|防|卸载|@|距离|DIRECT|直接连接|邀请|返利|循环|客服|网站|网址|获取|订阅|下次|版本|官址|备用|已用|联系|工单|贩卖|倒卖|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|GB
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
       interval: 600
       timeout: 3000
       expected-status: 204
-      lazy: true\`;
-            useProvidersForGroups += \`\\n      - \${subName2}\`;
+      lazy: true  # 按需唤醒测速，显著降低软路由 CPU 占用\`;
         }
 
-                lastGeneratedYaml = 
+        lastGeneratedYaml = 
 \`# ====================================================================
-# 配置名称：OpenClash 标准故障转移分流配置
-# 版本号：V0.2.5 (2026.08.28)
-# 内核要求：Mihomo (Meta) Kernel
+# 配置名称：OpenClash 区域全自动流控与延迟优化 (\${enableBackup ? '双代理融合测试版' : '单代理标准测试版'})
+# 版本号：V0.2.6.1-Test (生产环境测试版)
+# 内核要求：Mihomo (Meta) Kernel 专属
 # ====================================================================
 
-\${buildYamlBase(clashSecret)}
+port: 7890
+socks-port: 7891
+redir-port: 7892
+mixed-port: 7893
+tproxy-port: 7895
 
+allow-lan: true
+mode: rule
+log-level: info
+external-controller: 0.0.0.0:9090
+secret: "\${clashSecret}"
+ipv6: true
+unified-delay: true
+tcp-concurrent: true
+
+# ================================================================
+#                  🌟【使用者核心配置区域】🌟
+# ================================================================
+
+# 机场订阅配置
+# proxy-providers 或订阅 profile 中的节点）
 proxy-providers:
 \${proxyProvidersBlock}
 
+# ================================================================
+#                  🔒【系统核心逻辑区域】🔒
+# ================================================================
+
+# ------------------------
+# DNS配置
+# ------------------------
 \${YAML_DNS_BLOCK}
+
+# ------------------------
+# TUN模块
+# ------------------------
 \${YAML_TUN_BLOCK}
+
+# ------------------------
+# 节点状态保存
+# ------------------------
 \${YAML_PROFILE_BLOCK}
 
+# ------------------------
+# 核心策略组逻辑（保持 clash.js 原策略组，17 组，逐组展开）
+# ------------------------
 proxy-groups:
-  - name: "🚀 故障转移"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "♻️ 自动选择"
-    type: url-test
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    tolerance: 50
-  - name: "💬 即时通讯"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🌐 社交媒体"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🚀 GitHub"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-      - "🎯 全球直连"
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🤖 ChatGPT"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🤖 AI服务"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎶 TikTok"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "📹 YouTube"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎥 Netflix"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎥 DisneyPlus"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎥 HBO"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎥 PrimeVideo"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎥 AppleTV+"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎥 Emby"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎻 Spotify"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "📺 Bahamut"
-    type: fallback
-    proxies:
-      - "🇼🇸 台湾节点"
-      - "🚀 故障转移"
-      - "🎯 全球直连"
-    exclude-filter: '(?i)(?:🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🌎 国外媒体"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🛒 国外电商"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "📢 谷歌FCM"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🇬 谷歌服务"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🍎 苹果服务"
+  # 1. 节点选择
+  - name: 节点选择
     type: select
-    proxies:
-      - "🎯 全球直连"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-  - name: "Ⓜ️ 微软服务"
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "^(?!.*(官网|套餐|流量|异常|剩余)).*$"
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/adjust.svg"
+
+  # 2. 谷歌服务
+  - name: 谷歌服务
     type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
     proxies:
-      - "🎯 全球直连"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-  - name: "🎮 游戏平台"
+      - 节点选择
+      - 全局直连
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/google.svg"
+
+  # 3. YouTube
+  - name: YouTube
     type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
     proxies:
-      - "🎯 全球直连"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-  - name: "🎮 Steam"
+      - 节点选择
+      - 全局直连
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/youtube.svg"
+
+  # 4. Netflix
+  - name: Netflix
     type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
     proxies:
-      - "🎯 全球直连"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-  - name: "🚀 测速工具"
+      - 节点选择
+      - 全局直连
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/xiaolin-007/clash@main/icon/netflix.svg"
+
+  # 5. 电报消息
+  - name: 电报消息
     type: select
-    proxies:
-      - "🎯 全球直连"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-  - name: "🐟 漏网之鱼"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
     interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🔀 非标端口"
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 节点选择
+      - 全局直连
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/telegram.svg"
+
+  # 6. AI
+  - name: AI
     type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
     proxies:
-      - "🐟 漏网之鱼"
-      - "🎯 全球直连"
-  - name: "🇭🇰 香港节点"
-    type: url-test
-    filter: '(?i)(🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    tolerance: 50
-  - name: "🇺🇸 美国节点"
-    type: url-test
-    filter: '(?i)(🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    tolerance: 50
-  - name: "🇯🇵 日本节点"
-    type: url-test
-    filter: '(?i)(🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    tolerance: 50
-  - name: "🇸🇬 新加坡节点"
-    type: url-test
-    filter: '(?i)(🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    tolerance: 50
-  - name: "🇼🇸 台湾节点"
-    type: url-test
-    filter: '(?i)(🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    tolerance: 50
-  - name: "🇰🇷 韩国节点"
-    type: url-test
-    filter: '(?i)(🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-\${useProvidersForGroups}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    tolerance: 50
-  - name: "🎯 全球直连"
+      - 节点选择
+      - 全局直连
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/chatgpt.svg"
+
+  # 7. TikTok
+  - name: TikTok
     type: select
-    url: http://wifi.vivo.com.cn/generate_204
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    proxies:
+      - 节点选择
+      - 全局直连
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    icon: "https://fastly.jsdelivr.net/gh/xiaolin-007/clash@main/icon/tiktok.svg"
+
+  # 8. 微软服务
+  - name: 微软服务
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 全局直连
+      - 节点选择
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/microsoft.svg"
+
+  # 9. iCloud服务
+  - name: iCloud服务
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 全局直连
+      - 节点选择
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/xiaolin-007/clash@main/icon/iCloud.svg"
+
+  # 10. 苹果服务
+  - name: 苹果服务
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 节点选择
+      - 全局直连
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/apple.svg"
+
+  # 11. 动画疯
+  - name: 动画疯
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 节点选择
+      - 全局直连
+    include-all: true
+    filter: "(?i)台|tw|TW"
+    icon: "https://fastly.jsdelivr.net/gh/xiaolin-007/clash@main/icon/Bahamut.svg"
+
+  # 12. 哔哩哔哩港澳台
+  - name: 哔哩哔哩港澳台
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 全局直连
+      - 节点选择
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    filter: "^(?!.*(官网|套餐|流量|异常|剩余)).*$"
+    icon: "https://fastly.jsdelivr.net/gh/xiaolin-007/clash@main/icon/bilibili.svg"
+
+  # 13. Spotify
+  - name: Spotify
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 节点选择
+      - 全局直连
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/xiaolin-007/clash@main/icon/spotify.svg"
+
+  # 14. 广告过滤
+  - name: 广告过滤
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - REJECT
+      - DIRECT
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/bug.svg"
+
+  # 15. 全局直连
+  - name: 全局直连
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
     proxies:
       - DIRECT
+      - 节点选择
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/link.svg"
 
+  # 16. 全局拦截
+  - name: 全局拦截
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - REJECT
+      - DIRECT
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/block.svg"
+
+  # 17. 漏网之鱼
+  - name: 漏网之鱼
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 节点选择
+      - 全局直连
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    filter: "^(?!.*(官网|套餐|流量|异常|剩余)).*$"
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/fish.svg"
+
+  # ===== 地区分组：select 组默认选中「地区-自动」（最低延时节点），
+  #       组内仍列出该地区全部节点可手动切换；「地区-自动」为 url-test
+  #       自动测速组（interval 300s、tolerance 30ms、组内按延时升序） =====
+  # 香港节点
+  - name: 香港节点
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 香港-自动
+    include-all: true
+    filter: "广港|香港|HK|Hong Kong|🇭🇰|HongKong"
+
+  - name: 香港-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "广港|香港|HK|Hong Kong|🇭🇰|HongKong"
+
+  # 台湾节点
+  - name: 台湾节点
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 台湾-自动
+    include-all: true
+    filter: "广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan"
+
+  - name: 台湾-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan"
+
+  # 日本节点
+  - name: 日本节点
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 日本-自动
+    include-all: true
+    filter: "广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan"
+
+  - name: 日本-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan"
+
+  # 新加坡节点
+  - name: 新加坡节点
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 新加坡-自动
+    include-all: true
+    filter: "广新|新加坡|SG|坡|狮城|🇸🇬|Singapore"
+
+  - name: 新加坡-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "广新|新加坡|SG|坡|狮城|🇸🇬|Singapore"
+
+  # 韩国节点
+  - name: 韩国节点
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 韩国-自动
+    include-all: true
+    filter: "广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea"
+
+  - name: 韩国-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea"
+
+  # 美国节点
+  - name: 美国节点
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 美国-自动
+    include-all: true
+    filter: "广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States"
+
+  - name: 美国-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States"
+
+  # 英国节点
+  - name: 英国节点
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 英国-自动
+    include-all: true
+    filter: "英国|英|伦敦|UK|United Kingdom|🇬🇧|London"
+
+  - name: 英国-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "英国|英|伦敦|UK|United Kingdom|🇬🇧|London"
+
+  # 其他地区（反向排除已识别地区）
+  - name: 其他地区
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 其他地区-自动
+    include-all: true
+    filter: "^((?!(直连|拒绝|广港|香港|HK|Hong Kong|🇭🇰|HongKong|广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan|广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|广新|新加坡|SG|坡|狮城|🇸🇬|Singapore|广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|英国|UK|United Kingdom|伦敦|英|London|🇬🇧)).)*$"
+
+  - name: 其他地区-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "^((?!(直连|拒绝|广港|香港|HK|Hong Kong|🇭🇰|HongKong|广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan|广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|广新|新加坡|SG|坡|狮城|🇸🇬|Singapore|广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|英国|UK|United Kingdom|伦敦|英|London|🇬🇧)).)*$"
+
+  # ===== 全局自动组：自动测速并切换到最低延时节点 =====
+  - name: 自动选择
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "^(?!.*(官网|套餐|流量|异常|剩余)).*$"
+
+# ------------------------
+# 规则体系
+# ------------------------
 rules:
-  # ===== WebRTC 物理防泄漏 =====
-  - "AND,((NETWORK,UDP),(DST-PORT,3478)),REJECT"
-  - "DOMAIN-KEYWORD,webrtc,REJECT"
-  - "DOMAIN-KEYWORD,stun,REJECT"
-  - "DOMAIN-SUFFIX,stun.l.google.com,REJECT"
-  - "DOMAIN-SUFFIX,stun1.l.google.com,REJECT"
-  - "DOMAIN-SUFFIX,stun2.l.google.com,REJECT"
-  - "DOMAIN-SUFFIX,stun3.l.google.com,REJECT"
-  - "DOMAIN-SUFFIX,stun4.l.google.com,REJECT"
+  # 物理防泄漏 WebRTC
+  - AND,((NETWORK,UDP),(DST-PORT,3478)),REJECT
+  - DOMAIN-KEYWORD,webrtc,REJECT
+  - DOMAIN-KEYWORD,stun,REJECT
+  - DOMAIN-SUFFIX,stun.l.google.com,REJECT
+  - DOMAIN-SUFFIX,stun1.l.google.com,REJECT
+  - DOMAIN-SUFFIX,stun2.l.google.com,REJECT
+  - DOMAIN-SUFFIX,stun3.l.google.com,REJECT
+  - DOMAIN-SUFFIX,stun4.l.google.com,REJECT
 
-  # ===== 银行/支付/政务/风控 强制直连 =====
-  - "DOMAIN-SUFFIX,tongdun.net,🎯 全球直连"
-  - "DOMAIN-SUFFIX,ishumei.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,geetest.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,dingxiangyun.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,unionpay.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,95516.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,alipay.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,wechat.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,wechatpay.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,tenpay.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,gov.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,12306.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,chsi.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,chinatax.gov.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,mohrss.gov.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,gwy.gov.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,95559.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,95599.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,abchina.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,icbc.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,ccb.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,boc.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,cmbchina.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,citicbank.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,cib.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,spdb.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,cmbc.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,cebbank.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,hxb.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,psbc.com,🎯 全球直连"
-  - "DOMAIN-KEYWORD,bank,🎯 全球直连"
+  # 1. 银行/支付/政务/风控系统 强制直连
+  - DOMAIN-SUFFIX,tongdun.net,DIRECT
+  - DOMAIN-SUFFIX,ishumei.com,DIRECT
+  - DOMAIN-SUFFIX,geetest.com,DIRECT
+  - DOMAIN-SUFFIX,dingxiangyun.com,DIRECT
+  - DOMAIN-SUFFIX,unionpay.com,DIRECT
+  - DOMAIN-SUFFIX,95516.com,DIRECT
+  - DOMAIN-SUFFIX,alipay.com,DIRECT
+  - DOMAIN-SUFFIX,wechat.com,DIRECT
+  - DOMAIN-SUFFIX,wechatpay.cn,DIRECT
+  - DOMAIN-SUFFIX,tenpay.com,DIRECT
+  - DOMAIN-SUFFIX,gov.cn,DIRECT
+  - DOMAIN-SUFFIX,12306.cn,DIRECT
+  - DOMAIN-SUFFIX,chsi.com.cn,DIRECT
+  - DOMAIN-SUFFIX,chinatax.gov.cn,DIRECT
+  - DOMAIN-SUFFIX,mohrss.gov.cn,DIRECT
+  - DOMAIN-SUFFIX,gwy.gov.cn,DIRECT
+  - DOMAIN-SUFFIX,95559.com.cn,DIRECT
+  - DOMAIN-SUFFIX,95599.cn,DIRECT
+  - DOMAIN-SUFFIX,abchina.com,DIRECT
+  - DOMAIN-SUFFIX,icbc.com.cn,DIRECT
+  - DOMAIN-SUFFIX,ccb.com,DIRECT
+  - DOMAIN-SUFFIX,boc.cn,DIRECT
+  - DOMAIN-SUFFIX,cmbchina.com,DIRECT
+  - DOMAIN-SUFFIX,citicbank.com,DIRECT
+  - DOMAIN-SUFFIX,cib.com.cn,DIRECT
+  - DOMAIN-SUFFIX,spdb.com.cn,DIRECT
+  - DOMAIN-SUFFIX,cmbc.com.cn,DIRECT
+  - DOMAIN-SUFFIX,cebbank.com,DIRECT
+  - DOMAIN-SUFFIX,hxb.com.cn,DIRECT
+  - DOMAIN-SUFFIX,psbc.com,DIRECT
+  - DOMAIN-KEYWORD,bank,DIRECT
 
-  # ===== 国内核心基础服务直连 =====
-  - "DOMAIN-SUFFIX,10086.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,10010.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,189.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,taobao.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,jd.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,douyin.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,bilibili.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,mi.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,midea.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,baidu.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,qq.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,meituan.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,dianping.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,amap.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,163.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,sohu.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,sina.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,mi-img.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,aqara.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,tplinkcloud.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,heislands.com,🎯 全球直连"
+  # 2. 国内核心基础服务直连
+  - DOMAIN-SUFFIX,10086.cn,DIRECT
+  - DOMAIN-SUFFIX,10010.com,DIRECT
+  - DOMAIN-SUFFIX,189.cn,DIRECT
+  - DOMAIN-SUFFIX,taobao.com,DIRECT
+  - DOMAIN-SUFFIX,jd.com,DIRECT
+  - DOMAIN-SUFFIX,douyin.com,DIRECT
+  - DOMAIN-SUFFIX,bilibili.com,DIRECT
+  - DOMAIN-SUFFIX,mi.com,DIRECT
+  - DOMAIN-SUFFIX,midea.com,DIRECT
+  - DOMAIN-SUFFIX,baidu.com,DIRECT
+  - DOMAIN-SUFFIX,qq.com,DIRECT
+  - DOMAIN-SUFFIX,meituan.com,DIRECT
+  - DOMAIN-SUFFIX,dianping.com,DIRECT
+  - DOMAIN-SUFFIX,amap.com,DIRECT
+  - DOMAIN-SUFFIX,163.com,DIRECT
+  - DOMAIN-SUFFIX,sohu.com,DIRECT
+  - DOMAIN-SUFFIX,sina.com.cn,DIRECT
+  - DOMAIN-SUFFIX,mi-img.com,DIRECT
+  - DOMAIN-SUFFIX,aqara.com,DIRECT
+  - DOMAIN-SUFFIX,tplinkcloud.com,DIRECT
+  - DOMAIN-SUFFIX,heislands.com,DIRECT
 
-  - "GEOSITE,private,🎯 全球直连"
-  - "GEOIP,private,🎯 全球直连,no-resolve"
-  - "RULE-SET,Custom_Direct_Domain,🎯 全球直连"
-  - "RULE-SET,Custom_Direct_IP,🎯 全球直连,no-resolve"
-  - "RULE-SET,Custom_Direct_Port,🎯 全球直连"
-  - "RULE-SET,Custom_Proxy_Domain,🚀 故障转移"
-  - "RULE-SET,Custom_Proxy_IP,🚀 故障转移,no-resolve"
-  - "GEOSITE,google-cn,🎯 全球直连"
-  - "GEOSITE,category-games@cn,🎯 全球直连"
-  - "RULE-SET,Steam_CDN_Domain,🎯 全球直连"
-  - "RULE-SET,Steam_CDN_IP,🎯 全球直连,no-resolve"
-  - "GEOSITE,category-game-platforms-download,🎯 全球直连"
-  - "GEOSITE,category-public-tracker,🎯 全球直连"
-  - "GEOSITE,category-communication,💬 即时通讯"
-  - "GEOSITE,category-social-media-!cn,🌐 社交媒体"
-  - "GEOSITE,openai,🤖 ChatGPT"
-  - "GEOSITE,category-ai-!cn,🤖 AI服务"
-  - "GEOSITE,github,🚀 GitHub"
-  - "GEOSITE,category-speedtest,🚀 测速工具"
-  - "GEOSITE,steam,🎮 Steam"
-  - "GEOSITE,youtube,📹 YouTube"
-  - "GEOSITE,apple-tvplus,🎥 AppleTV+"
-  - "GEOSITE,apple,🍎 苹果服务"
-  - "GEOSITE,microsoft,Ⓜ️ 微软服务"
-  - "GEOSITE,googlefcm,📢 谷歌FCM"
-  - "GEOSITE,google,🇬 谷歌服务"
-  - "GEOSITE,tiktok,🎶 TikTok"
-  - "GEOSITE,netflix,🎥 Netflix"
-  - "GEOSITE,disney,🎥 DisneyPlus"
-  - "GEOSITE,hbo,🎥 HBO"
-  - "GEOSITE,primevideo,🎥 PrimeVideo"
-  - "GEOSITE,category-emby,🎥 Emby"
-  - "GEOSITE,spotify,🎻 Spotify"
-  - "GEOSITE,bahamut,📺 Bahamut"
-  - "GEOSITE,category-games,🎮 游戏平台"
-  - "GEOSITE,category-entertainment,🌎 国外媒体"
-  - "GEOSITE,category-ecommerce,🛒 国外电商"
-  - "GEOSITE,gfw,🚀 故障转移"
-  - "GEOIP,telegram,💬 即时通讯,no-resolve"
-  - "GEOIP,twitter,🌐 社交媒体,no-resolve"
-  - "GEOIP,facebook,🌐 社交媒体,no-resolve"
-  - "GEOIP,google,🇬 谷歌服务,no-resolve"
-  - "GEOIP,netflix,🎥 Netflix,no-resolve"
-  # ===== 远程规则集（目标已映射到现有策略组）=====
-  - "RULE-SET,Test / Domain,🚀 测速工具"
-  - "RULE-SET,Block / Domain,REJECT"
-  - "RULE-SET,ChatGPT / Domain,🤖 ChatGPT"
-  - "RULE-SET,Claude / Domain,🤖 AI服务"
-  - "RULE-SET,Meta AI / Domain,🤖 AI服务"
-  - "RULE-SET,Perplexity / Domain,🤖 AI服务"
-  - "RULE-SET,Copilot / Domain,🤖 AI服务"
-  - "RULE-SET,Gemini / Domain,🤖 AI服务"
-  - "RULE-SET,Groq / Domain,🤖 AI服务"
-  - "RULE-SET,Grok / Domain,🤖 AI服务"
-  - "RULE-SET,Reddit / Domain,🌐 社交媒体"
-  - "RULE-SET,GitHub / Domain,🚀 GitHub"
-  - "RULE-SET,Telegram / Domain,💬 即时通讯"
-  - "RULE-SET,Telegram / IP,💬 即时通讯,no-resolve"
-  - "RULE-SET,WhatsApp / Domain,💬 即时通讯"
-  - "RULE-SET,Facebook / Domain,🌐 社交媒体"
-  - "RULE-SET,Apple / Domain,🍎 苹果服务"
-  - "RULE-SET,Apple-CN / Domain,🍎 苹果服务"
-  - "RULE-SET,Microsoft / Domain,Ⓜ️ 微软服务"
-  - "RULE-SET,OKX / Domain,🚀 故障转移"
-  - "RULE-SET,Bybit / Domain,🚀 故障转移"
-  - "RULE-SET,Binance / Domain,🚀 故障转移"
-  - "RULE-SET,BiliBili / Domain,🎯 全球直连"
-  - "RULE-SET,YouTube / Domain,📹 YouTube"
-  - "RULE-SET,TikTok / Domain,🎶 TikTok"
-  - "RULE-SET,Netflix / Domain,🎥 Netflix"
-  - "RULE-SET,Netflix / IP,🎥 Netflix,no-resolve"
-  - "DOMAIN-KEYWORD,netflix,🎥 Netflix"
-  - "RULE-SET,Disney / Domain,🎥 DisneyPlus"
-  - "RULE-SET,Amazon / Domain,🎥 PrimeVideo"
-  - "RULE-SET,Crunchyroll / Domain,🌎 国外媒体"
-  - "RULE-SET,Popcorn / Domain,🌎 国外媒体"
-  - "RULE-SET,HBO / Domain,🎥 HBO"
-  - "RULE-SET,Spotify / Domain,🎻 Spotify"
-  - "RULE-SET,Steam / Domain,🎮 Steam"
-  - "RULE-SET,Epic / Domain,🎮 游戏平台"
-  - "RULE-SET,EA / Domain,🎮 游戏平台"
-  - "RULE-SET,Blizzard / Domain,🎮 游戏平台"
-  - "RULE-SET,UBI / Domain,🎮 游戏平台"
-  - "RULE-SET,PlayStation / Domain,🎮 游戏平台"
-  - "RULE-SET,Nintendo / Domain,🎮 游戏平台"
-  - "RULE-SET,Google / Domain,🇬 谷歌服务"
-  - "RULE-SET,Google / IP,🇬 谷歌服务,no-resolve"
-  - "RULE-SET,Nvidia / Domain,🎮 游戏平台"
-  - "RULE-SET,Proxy / Domain,🚀 故障转移"
-  - "RULE-SET,Globe / Domain,🚀 故障转移"
-  - "RULE-SET,Direct / Domain,🎯 全球直连"
-  - "RULE-SET,China / Domain,🎯 全球直连"
-  - "RULE-SET,China / IP,🎯 全球直连,no-resolve"
-  - "RULE-SET,Private / Domain,🎯 全球直连"
+  # 3. 远程规则集（IP 规则包含 no-resolve，避免强制反查 DNS；
+  #    目标组已按映射表合并）
+  - RULE-SET,Test / Domain,节点选择
+  - RULE-SET,Block / Domain,广告过滤
+  - RULE-SET,ChatGPT / Domain,AI
+  - RULE-SET,Claude / Domain,AI
+  - RULE-SET,Meta AI / Domain,AI
+  - RULE-SET,Perplexity / Domain,AI
+  - RULE-SET,Copilot / Domain,AI
+  - RULE-SET,Gemini / Domain,AI
+  - RULE-SET,Groq / Domain,AI
+  - RULE-SET,Grok / Domain,AI
+  - RULE-SET,Reddit / Domain,节点选择
+  - RULE-SET,GitHub / Domain,节点选择
+  - RULE-SET,Telegram / Domain,电报消息
+  - RULE-SET,Telegram / IP,电报消息,no-resolve
+  - RULE-SET,WhatsApp / Domain,节点选择
+  - RULE-SET,Facebook / Domain,节点选择
+  - RULE-SET,Apple / Domain,苹果服务
+  - RULE-SET,Apple-CN / Domain,苹果服务
+  - RULE-SET,Microsoft / Domain,微软服务
+  - RULE-SET,OKX / Domain,节点选择
+  - RULE-SET,Bybit / Domain,节点选择
+  - RULE-SET,Binance / Domain,节点选择
+  - RULE-SET,BiliBili / Domain,哔哩哔哩港澳台
+  - RULE-SET,YouTube / Domain,YouTube
+  - RULE-SET,TikTok / Domain,TikTok
+  - RULE-SET,Netflix / Domain,Netflix
+  - RULE-SET,Netflix / IP,Netflix,no-resolve
+  - DOMAIN-KEYWORD,netflix,Netflix
+  - RULE-SET,Disney / Domain,节点选择
+  - RULE-SET,Amazon / Domain,节点选择
+  - RULE-SET,Crunchyroll / Domain,节点选择
+  - RULE-SET,Popcorn / Domain,节点选择
+  - RULE-SET,HBO / Domain,节点选择
+  - RULE-SET,Spotify / Domain,Spotify
+  - RULE-SET,Steam / Domain,节点选择
+  - RULE-SET,Epic / Domain,节点选择
+  - RULE-SET,EA / Domain,节点选择
+  - RULE-SET,Blizzard / Domain,节点选择
+  - RULE-SET,UBI / Domain,节点选择
+  - RULE-SET,PlayStation / Domain,节点选择
+  - RULE-SET,Nintendo / Domain,节点选择
+  - RULE-SET,Google / Domain,谷歌服务
+  - RULE-SET,Google / IP,谷歌服务,no-resolve
+  - RULE-SET,Nvidia / Domain,节点选择
+  - RULE-SET,Proxy / Domain,节点选择
+  - RULE-SET,Globe / Domain,节点选择
+  - RULE-SET,Direct / Domain,全局直连
+  - RULE-SET,China / Domain,全局直连
+  - RULE-SET,China / IP,全局直连,no-resolve
+  - RULE-SET,Private / Domain,全局直连
+  - MATCH,漏网之鱼
 
-  - "GEOSITE,cn,🎯 全球直连"
-  - "GEOIP,cn,🎯 全球直连,no-resolve"
-  - "RULE-SET,Nonstandard_Port_Direct,🔀 非标端口"
-  - "MATCH,🐟 漏网之鱼"
-
+# ------------------------
+# 规则集提供者
+# ------------------------
 rule-providers:
-  Nonstandard_Port_Direct:
-    behavior: classical
-    interval: 28800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"
-    format: yaml
-  Custom_Direct_Domain:
-    behavior: domain
-    interval: 1800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.mrs"
-    format: mrs
-  Custom_Direct_IP:
-    behavior: ipcidr
-    interval: 28800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_IP.mrs"
-    format: mrs
-  Custom_Direct_Port:
-    behavior: classical
-    interval: 28800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_Port.yaml"
-    format: yaml
-  Custom_Proxy_Domain:
-    behavior: domain
-    interval: 28800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.mrs"
-    format: mrs
-  Custom_Proxy_IP:
-    behavior: ipcidr
-    interval: 28800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_IP.mrs"
-    format: mrs
-  Steam_CDN_Domain:
-    behavior: domain
-    interval: 28800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Steam_CDN_Domain.mrs"
-    format: mrs
-  Steam_CDN_IP:
-    behavior: ipcidr
-    interval: 28800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Steam_CDN_IP.mrs"
-    format: mrs
-
-  # ----- 远程规则集补充（自包含，无锚点依赖）-----
   Test / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Check.list"}
-  Block / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Block.list"}
   ChatGPT / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/openai.mrs"}
   Claude / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Claude/Claude.list"}
   Meta AI / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/MetaAi.list"}
   Perplexity / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/perplexity.mrs"}
   Copilot / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Copilot.list"}
   Gemini / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Gemini.list"}
-  Groq / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/groq.mrs"}
-  Grok / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Grok.list"}
-  Reddit / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/reddit.mrs"}
   GitHub / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/github.mrs"}
   Telegram / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/telegram.mrs"}
   Telegram / IP: {type: http, interval: 86400, behavior: ipcidr, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/telegram.mrs"}
   WhatsApp / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Whatsapp/Whatsapp.list"}
   Facebook / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/facebook.mrs"}
-  Apple / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/apple.mrs"}
+  Amazon / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/amazon.mrs"}
   Apple-CN / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/apple-cn.mrs"}
+  Apple / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/apple.mrs"}
   Microsoft / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/microsoft.mrs"}
   OKX / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/okx.mrs"}
   Bybit / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/bybit.mrs"}
   Binance / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/binance.mrs"}
-  BiliBili / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/bilibili.mrs"}
-  YouTube / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/youtube.mrs"}
   TikTok / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/tiktok.mrs"}
   Netflix / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/netflix.mrs"}
   Netflix / IP: {type: http, interval: 86400, behavior: ipcidr, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/netflix.mrs"}
   Disney / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/disney.mrs"}
-  Amazon / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/amazon.mrs"}
-  Crunchyroll / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Crunchyroll.list"}
-  Popcorn / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Popcorn.list"}
   HBO / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/hbo.mrs"}
   Spotify / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/spotify.mrs"}
   Steam / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/steam.mrs"}
@@ -4396,18 +4424,26 @@ rule-providers:
   UBI / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/UBI/UBI.list"}
   PlayStation / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/PlayStation/PlayStation.list"}
   Nintendo / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Nintendo/Nintendo.list"}
-  Google / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/google.mrs"}
-  Google / IP: {type: http, interval: 86400, behavior: ipcidr, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/google.mrs"}
-  Nvidia / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Nvidia/Nvidia.list"}
   Proxy / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Proxy.list"}
   Globe / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Global/Global.list"}
+  Block / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Block.list"}
+  Nvidia / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Nvidia/Nvidia.list"}
+  Crunchyroll / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Crunchyroll.list"}
+  Reddit / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/reddit.mrs"}
+  Groq / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/groq.mrs"}
+  Grok / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Grok.list"}
+  Popcorn / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Popcorn.list"}
   Direct / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Direct.list"}
   Private / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/private.mrs"}
   China / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/cn.mrs"}
-  China / IP: {type: http, interval: 86400, behavior: ipcidr, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/cn.mrs"}\`;
+  China / IP: {type: http, interval: 86400, behavior: ipcidr, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/cn.mrs"}
+  YouTube / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/youtube.mrs"}
+  Google / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/google.mrs"}
+  Google / IP: {type: http, interval: 86400, behavior: ipcidr, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/google.mrs"}
+  BiliBili / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/bilibili.mrs"}\`;
 
         document.getElementById('out-full').innerText = lastGeneratedYaml;
-        statusMsg.innerText = '✅ V0.2.5 标准分流配置文件已生成！';
+        statusMsg.innerText = '✅ v0.2.6.1 标准分流配置文件已生成！';
 
         if (autoDownload) {
             await downloadYaml();
@@ -4535,7 +4571,8 @@ rule-providers:
             // ================================
             lastGeneratedYaml = 
 \`# ====================================================================
-# 配置名称：OpenClash 直连模式 - 网段/单IP精准分流版
+# 配置名称：OpenClash 直连模式 - 网段/单IP精准分流测试版
+# 版本号：V0.2.6.1-Test (生产环境测试版)
 # 内核要求：Mihomo (Meta) Kernel 专属
 # 架构方案：节点直连 + 指定设备IP/网段精准分流 + 防泄漏（无中转/无链式/无策略组分流）
 # 说明：无订阅源 → 无聚合节点 → 域名级分流已失效，仅保留 SRC-IP-CIDR 源地址分流
@@ -4642,9 +4679,10 @@ rules:
                 await downloadYaml();
             }
         } else {
-                lastGeneratedYaml = 
+        lastGeneratedYaml = 
 \`# ====================================================================
-# 配置名称：OpenClash 多设备/网段精准分流版
+# 配置名称：OpenClash 多设备/网段精准分流测试版
+# 版本号：V0.2.6.1-Test (生产环境测试版)
 # 内核要求：Mihomo (Meta) Kernel 专属
 # 架构方案：代理中转 + 独享住宅IP落地 + 指定设备IP/网段精准分流 + 防泄漏
 # ====================================================================
@@ -4655,19 +4693,15 @@ proxy-providers:
   \${subName}:
     url: "\${subUrl}"
     type: http
-    interval: 3600
-    path: ./proxy_provider/provider1.yaml
-    proxy: DIRECT
-    filter: "^(?!.*(DIRECT|直接连接|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|GB|Expire)).*$"
+    interval: 86400
+    exclude-filter: 流量|账号|剩余|到期|过期|测试|试用|TG|群|官网|Expire|APP|官方|异常|邮箱|防|卸载|@|距离|DIRECT|直接连接|邀请|返利|循环|客服|网站|网址|获取|订阅|下次|版本|官址|备用|已用|联系|工单|贩卖|倒卖|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|GB
     health-check:
       enable: true
-      url: https://cp.cloudflare.com/generate_204
-      interval: 300
-      timeout: 5000
-      lazy: false
+      url: https://www.gstatic.com/generate_204
+      interval: 600
+      timeout: 3000
       expected-status: 204
-    override:
-      udp: true
+      lazy: true  # 按需唤醒测速，显著降低软路由 CPU 占用
 
 proxies:
 \${proxiesArr.join('\\n')}
@@ -4683,765 +4717,761 @@ proxy-groups:
 \${residentialGroupProxies.join('\\n')}
 
 \${wifiSingleGroups.join('\\n\\n')}
-  - name: "🚀 故障转移"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "♻️ 自动选择"
-    type: url-test
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    tolerance: 50
-  - name: "💬 即时通讯"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🌐 社交媒体"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🚀 GitHub"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-      - "🎯 全球直连"
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🤖 ChatGPT"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🤖 AI服务"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎶 TikTok"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "📹 YouTube"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎥 Netflix"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎥 DisneyPlus"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎥 HBO"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎥 PrimeVideo"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎥 AppleTV+"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎥 Emby"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🎻 Spotify"
-    type: fallback
-    proxies:
-      - "🇸🇬 新加坡节点"
-      - "🇯🇵 日本节点"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "📺 Bahamut"
-    type: fallback
-    proxies:
-      - "🇼🇸 台湾节点"
-      - "🚀 故障转移"
-      - "🎯 全球直连"
-    exclude-filter: '(?i)(?:🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🌎 国外媒体"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🛒 国外电商"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "📢 谷歌FCM"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🇬 谷歌服务"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🍎 苹果服务"
+
+  # 1. 节点选择
+  - name: 节点选择
     type: select
-    proxies:
-      - "🎯 全球直连"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-  - name: "Ⓜ️ 微软服务"
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "^(?!.*(官网|套餐|流量|异常|剩余)).*$"
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/adjust.svg"
+
+  # 2. 谷歌服务
+  - name: 谷歌服务
     type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
     proxies:
-      - "🎯 全球直连"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-  - name: "🎮 游戏平台"
+      - 节点选择
+      - 全局直连
+      - 纯静态住宅-落地组
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/google.svg"
+
+  # 3. YouTube
+  - name: YouTube
     type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
     proxies:
-      - "🎯 全球直连"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-  - name: "🎮 Steam"
+      - 节点选择
+      - 全局直连
+      - 纯静态住宅-落地组
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/youtube.svg"
+
+  # 4. Netflix
+  - name: Netflix
     type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
     proxies:
-      - "🎯 全球直连"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-  - name: "🚀 测速工具"
+      - 节点选择
+      - 全局直连
+      - 纯静态住宅-落地组
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/xiaolin-007/clash@main/icon/netflix.svg"
+
+  # 5. 电报消息
+  - name: 电报消息
     type: select
-    proxies:
-      - "🎯 全球直连"
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-  - name: "🐟 漏网之鱼"
-    type: fallback
-    proxies:
-      - "🇭🇰 香港节点"
-      - "🇺🇸 美国节点"
-      - "🇯🇵 日本节点"
-      - "🇸🇬 新加坡节点"
-      - "🇼🇸 台湾节点"
-      - "🇰🇷 韩国节点"
-      - "♻️ 自动选择"
-    exclude-filter: '(?i)(?:🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌|🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC|🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI|🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN|🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC|🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
     interval: 300
-    timeout: 5000
-    lazy: false
-    expected-status: 204
-  - name: "🔀 非标端口"
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 节点选择
+      - 全局直连
+      - 纯静态住宅-落地组
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/telegram.svg"
+
+  # 6. AI
+  - name: AI
     type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
     proxies:
-      - "🐟 漏网之鱼"
-      - "🎯 全球直连"
-  - name: "🇭🇰 香港节点"
-    type: url-test
-    filter: '(?i)(🇭🇰|港|\\bHK(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|hk|Hong Kong|HongKong|hongkong|HONG KONG|HONGKONG|深港|HKG|九龙|Kowloon|新界|沙田|荃湾|葵涌)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    tolerance: 50
-  - name: "🇺🇸 美国节点"
-    type: url-test
-    filter: '(?i)(🇺🇸|美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|纽约|纽纽|亚特兰大|迈阿密|华盛顿|\\bUS(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|United States|UnitedStates|UNITED STATES|USA|America|AMERICA|JFK|EWR|IAD|ATL|ORD|MIA|NYC|LAX|SFO|SEA|DFW|SJC)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    tolerance: 50
-  - name: "🇯🇵 日本节点"
-    type: url-test
-    filter: '(?i)(🇯🇵|日本|川日|东京|大阪|泉日|埼玉|沪日|深日|(?<!尼|-)日|\\bJP(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Japan|JAPAN|JPN|NRT|HND|KIX|TYO|OSA|关西|Kansai|KANSAI)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    tolerance: 50
-  - name: "🇸🇬 新加坡节点"
-    type: url-test
-    filter: '(?i)(🇸🇬|新加坡|坡|狮城|\\bSG(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Singapore|SINGAPORE|SIN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    tolerance: 50
-  - name: "🇼🇸 台湾节点"
-    type: url-test
-    filter: '(?i)(🇹🇼|🇼🇸|台|新北|彰化|\\bTW(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Taiwan|TAIWAN|TWN|TPE|ROC)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    tolerance: 50
-  - name: "🇰🇷 韩国节点"
-    type: url-test
-    filter: '(?i)(🇰🇷|\\bKR(?:[-_ ]?\\d+(?:[-_ ]?[A-Za-z]{2,})?)?\\b|Korea|KOREA|KOR|首尔|韩|韓|春川|Chuncheon|ICN)'
-    use:
-      - \${subName}
-    url: https://cp.cloudflare.com/generate_204
-    interval: 300
-    tolerance: 50
-  - name: "🎯 全球直连"
+      - 节点选择
+      - 全局直连
+      - 纯静态住宅-落地组
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/chatgpt.svg"
+
+  # 7. TikTok
+  - name: TikTok
     type: select
-    url: http://wifi.vivo.com.cn/generate_204
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 节点选择
+      - 全局直连
+      - 纯静态住宅-落地组
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/xiaolin-007/clash@main/icon/tiktok.svg"
+
+  # 8. 微软服务
+  - name: 微软服务
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 全局直连
+      - 纯静态住宅-落地组
+      - 节点选择
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/microsoft.svg"
+
+  # 9. iCloud服务
+  - name: iCloud服务
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 全局直连
+      - 纯静态住宅-落地组
+      - 节点选择
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/xiaolin-007/clash@main/icon/iCloud.svg"
+
+  # 10. 苹果服务
+  - name: 苹果服务
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 节点选择
+      - 全局直连
+      - 纯静态住宅-落地组
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/apple.svg"
+
+  # 11. 动画疯
+  - name: 动画疯
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 节点选择
+      - 全局直连
+    include-all: true
+    filter: "(?i)台|tw|TW"
+    icon: "https://fastly.jsdelivr.net/gh/xiaolin-007/clash@main/icon/Bahamut.svg"
+
+  # 12. 哔哩哔哩港澳台
+  - name: 哔哩哔哩港澳台
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 全局直连
+      - 纯静态住宅-落地组
+      - 节点选择
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    filter: "^(?!.*(官网|套餐|流量|异常|剩余)).*$"
+    icon: "https://fastly.jsdelivr.net/gh/xiaolin-007/clash@main/icon/bilibili.svg"
+
+  # 13. Spotify
+  - name: Spotify
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 节点选择
+      - 全局直连
+      - 纯静态住宅-落地组
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/xiaolin-007/clash@main/icon/spotify.svg"
+
+  # 14. 广告过滤
+  - name: 广告过滤
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - REJECT
+      - DIRECT
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/bug.svg"
+
+  # 15. 全局直连
+  - name: 全局直连
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
     proxies:
       - DIRECT
+      - 节点选择
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/link.svg"
+
+  # 16. 全局拦截
+  - name: 全局拦截
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - REJECT
+      - DIRECT
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/block.svg"
+
+  # 17. 漏网之鱼
+  - name: 漏网之鱼
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 节点选择
+      - 全局直连
+      - 纯静态住宅-落地组
+      - 自动选择
+      - 香港节点
+      - 台湾节点
+      - 日本节点
+      - 新加坡节点
+      - 韩国节点
+      - 美国节点
+      - 英国节点
+      - 其他地区
+    include-all: true
+    filter: "^(?!.*(官网|套餐|流量|异常|剩余)).*$"
+    icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/fish.svg"
+
+  # ===== 地区分组：select 组默认选中「地区-自动」（最低延时节点），
+  #       组内仍列出该地区全部节点可手动切换；「地区-自动」为 url-test
+  #       自动测速组（interval 300s、tolerance 30ms、组内按延时升序） =====
+  # 香港节点
+  - name: 香港节点
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 香港-自动
+    include-all: true
+    filter: "广港|香港|HK|Hong Kong|🇭🇰|HongKong"
+
+  - name: 香港-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "广港|香港|HK|Hong Kong|🇭🇰|HongKong"
+
+  # 台湾节点
+  - name: 台湾节点
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 台湾-自动
+    include-all: true
+    filter: "广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan"
+
+  - name: 台湾-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan"
+
+  # 日本节点
+  - name: 日本节点
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 日本-自动
+    include-all: true
+    filter: "广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan"
+
+  - name: 日本-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan"
+
+  # 新加坡节点
+  - name: 新加坡节点
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 新加坡-自动
+    include-all: true
+    filter: "广新|新加坡|SG|坡|狮城|🇸🇬|Singapore"
+
+  - name: 新加坡-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "广新|新加坡|SG|坡|狮城|🇸🇬|Singapore"
+
+  # 韩国节点
+  - name: 韩国节点
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 韩国-自动
+    include-all: true
+    filter: "广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea"
+
+  - name: 韩国-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea"
+
+  # 美国节点
+  - name: 美国节点
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 美国-自动
+    include-all: true
+    filter: "广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States"
+
+  - name: 美国-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States"
+
+  # 英国节点
+  - name: 英国节点
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 英国-自动
+    include-all: true
+    filter: "英国|英|伦敦|UK|United Kingdom|🇬🇧|London"
+
+  - name: 英国-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "英国|英|伦敦|UK|United Kingdom|🇬🇧|London"
+
+  # 其他地区（反向排除已识别地区）
+  - name: 其他地区
+    type: select
+    interval: 300
+    timeout: 3000
+    url: "https://www.google.com/generate_204"
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    proxies:
+      - 其他地区-自动
+    include-all: true
+    filter: "^((?!(直连|拒绝|广港|香港|HK|Hong Kong|🇭🇰|HongKong|广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan|广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|广新|新加坡|SG|坡|狮城|🇸🇬|Singapore|广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|英国|UK|United Kingdom|伦敦|英|London|🇬🇧)).)*$"
+
+  - name: 其他地区-自动
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "^((?!(直连|拒绝|广港|香港|HK|Hong Kong|🇭🇰|HongKong|广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan|广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|广新|新加坡|SG|坡|狮城|🇸🇬|Singapore|广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|英国|UK|United Kingdom|伦敦|英|London|🇬🇧)).)*$"
+
+  # ===== 全局自动组：自动测速并切换到最低延时节点 =====
+  - name: 自动选择
+    type: url-test
+    url: "https://www.google.com/generate_204"
+    interval: 300
+    timeout: 3000
+    tolerance: 30
+    lazy: true
+    max-failed-times: 3
+    hidden: false
+    include-all: true
+    filter: "^(?!.*(官网|套餐|流量|异常|剩余)).*$"
 
 rules:
-  # ===== WebRTC 物理防泄漏 =====
-  - "AND,((NETWORK,UDP),(DST-PORT,3478)),REJECT"
-  - "DOMAIN-KEYWORD,webrtc,REJECT"
-  - "DOMAIN-KEYWORD,stun,REJECT"
-  - "DOMAIN-SUFFIX,stun.l.google.com,REJECT"
-  - "DOMAIN-SUFFIX,stun1.l.google.com,REJECT"
-  - "DOMAIN-SUFFIX,stun2.l.google.com,REJECT"
-  - "DOMAIN-SUFFIX,stun3.l.google.com,REJECT"
-  - "DOMAIN-SUFFIX,stun4.l.google.com,REJECT"
+  - AND,((NETWORK,UDP),(DST-PORT,3478)),REJECT 
+  - DOMAIN-KEYWORD,webrtc,REJECT
+  - DOMAIN-KEYWORD,stun,REJECT
+  - DOMAIN-SUFFIX,stun.l.google.com,REJECT
+  - DOMAIN-SUFFIX,stun1.l.google.com,REJECT
+  - DOMAIN-SUFFIX,stun2.l.google.com,REJECT
+  - DOMAIN-SUFFIX,stun3.l.google.com,REJECT
+  - DOMAIN-SUFFIX,stun4.l.google.com,REJECT  
 
 \${rulesArr.join('\\n')}
 
-  # ===== 银行/支付/政务/风控 强制直连 =====
-  - "DOMAIN-SUFFIX,tongdun.net,🎯 全球直连"
-  - "DOMAIN-SUFFIX,ishumei.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,geetest.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,dingxiangyun.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,unionpay.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,95516.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,alipay.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,wechat.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,wechatpay.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,tenpay.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,gov.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,12306.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,chsi.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,chinatax.gov.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,mohrss.gov.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,gwy.gov.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,95559.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,95599.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,abchina.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,icbc.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,ccb.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,boc.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,cmbchina.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,citicbank.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,cib.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,spdb.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,cmbc.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,cebbank.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,hxb.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,psbc.com,🎯 全球直连"
-  - "DOMAIN-KEYWORD,bank,🎯 全球直连"
+  - DOMAIN-SUFFIX,tongdun.net,DIRECT
+  - DOMAIN-SUFFIX,ishumei.com,DIRECT
+  - DOMAIN-SUFFIX,geetest.com,DIRECT
+  - DOMAIN-SUFFIX,dingxiangyun.com,DIRECT
+  - DOMAIN-SUFFIX,unionpay.com,DIRECT
+  - DOMAIN-SUFFIX,95516.com,DIRECT
+  - DOMAIN-SUFFIX,alipay.com,DIRECT
+  - DOMAIN-SUFFIX,wechat.com,DIRECT
+  - DOMAIN-SUFFIX,wechatpay.cn,DIRECT
+  - DOMAIN-SUFFIX,tenpay.com,DIRECT
+  - DOMAIN-SUFFIX,gov.cn,DIRECT
+  - DOMAIN-SUFFIX,12306.cn,DIRECT
+  - DOMAIN-SUFFIX,chsi.com.cn,DIRECT
+  - DOMAIN-SUFFIX,chinatax.gov.cn,DIRECT
+  - DOMAIN-SUFFIX,mohrss.gov.cn,DIRECT
+  - DOMAIN-SUFFIX,gwy.gov.cn,DIRECT
+  - DOMAIN-SUFFIX,95559.com.cn,DIRECT
+  - DOMAIN-SUFFIX,95599.cn,DIRECT
+  - DOMAIN-SUFFIX,abchina.com,DIRECT
+  - DOMAIN-SUFFIX,icbc.com.cn,DIRECT
+  - DOMAIN-SUFFIX,ccb.com,DIRECT
+  - DOMAIN-SUFFIX,boc.cn,DIRECT
+  - DOMAIN-SUFFIX,cmbchina.com,DIRECT
+  - DOMAIN-SUFFIX,citicbank.com,DIRECT
+  - DOMAIN-SUFFIX,cib.com.cn,DIRECT
+  - DOMAIN-SUFFIX,spdb.com.cn,DIRECT
+  - DOMAIN-SUFFIX,cmbc.com.cn,DIRECT
+  - DOMAIN-SUFFIX,cebbank.com,DIRECT
+  - DOMAIN-SUFFIX,hxb.com.cn,DIRECT
+  - DOMAIN-SUFFIX,psbc.com,DIRECT
+  - DOMAIN-KEYWORD,bank,DIRECT
 
-  # ===== 国内核心基础服务直连 =====
-  - "DOMAIN-SUFFIX,10086.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,10010.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,189.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,taobao.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,jd.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,douyin.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,bilibili.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,mi.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,midea.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,baidu.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,qq.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,meituan.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,dianping.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,amap.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,163.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,sohu.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,sina.com.cn,🎯 全球直连"
-  - "DOMAIN-SUFFIX,mi-img.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,aqara.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,tplinkcloud.com,🎯 全球直连"
-  - "DOMAIN-SUFFIX,heislands.com,🎯 全球直连"
+  - DOMAIN-SUFFIX,10086.cn,DIRECT
+  - DOMAIN-SUFFIX,10010.com,DIRECT
+  - DOMAIN-SUFFIX,189.cn,DIRECT
+  - DOMAIN-SUFFIX,taobao.com,DIRECT
+  - DOMAIN-SUFFIX,jd.com,DIRECT
+  - DOMAIN-SUFFIX,douyin.com,DIRECT
+  - DOMAIN-SUFFIX,bilibili.com,DIRECT
+  - DOMAIN-SUFFIX,mi.com,DIRECT
+  - DOMAIN-SUFFIX,midea.com,DIRECT
+  - DOMAIN-SUFFIX,baidu.com,DIRECT
+  - DOMAIN-SUFFIX,qq.com,DIRECT
+  - DOMAIN-SUFFIX,meituan.com,DIRECT
+  - DOMAIN-SUFFIX,dianping.com,DIRECT
+  - DOMAIN-SUFFIX,amap.com,DIRECT
+  - DOMAIN-SUFFIX,163.com,DIRECT
+  - DOMAIN-SUFFIX,sohu.com,DIRECT
+  - DOMAIN-SUFFIX,sina.com.cn,DIRECT
+  - DOMAIN-SUFFIX,mi-img.com,DIRECT
+  - DOMAIN-SUFFIX,aqara.com,DIRECT
+  - DOMAIN-SUFFIX,tplinkcloud.com,DIRECT
+  - DOMAIN-SUFFIX,heislands.com,DIRECT
+  
+  # 3. 远程规则集（IP 规则包含 no-resolve，避免强制反查 DNS；
+  #    目标组已按映射表合并）
+  - RULE-SET,Test / Domain,节点选择
+  - RULE-SET,Block / Domain,广告过滤
+  - RULE-SET,ChatGPT / Domain,AI
+  - RULE-SET,Claude / Domain,AI
+  - RULE-SET,Meta AI / Domain,AI
+  - RULE-SET,Perplexity / Domain,AI
+  - RULE-SET,Copilot / Domain,AI
+  - RULE-SET,Gemini / Domain,AI
+  - RULE-SET,Groq / Domain,AI
+  - RULE-SET,Grok / Domain,AI
+  - RULE-SET,Reddit / Domain,节点选择
+  - RULE-SET,GitHub / Domain,节点选择
+  - RULE-SET,Telegram / Domain,电报消息
+  - RULE-SET,Telegram / IP,电报消息,no-resolve
+  - RULE-SET,WhatsApp / Domain,节点选择
+  - RULE-SET,Facebook / Domain,节点选择
+  - RULE-SET,Apple / Domain,苹果服务
+  - RULE-SET,Apple-CN / Domain,苹果服务
+  - RULE-SET,Microsoft / Domain,微软服务
+  - RULE-SET,OKX / Domain,节点选择
+  - RULE-SET,Bybit / Domain,节点选择
+  - RULE-SET,Binance / Domain,节点选择
+  - RULE-SET,BiliBili / Domain,哔哩哔哩港澳台
+  - RULE-SET,YouTube / Domain,YouTube
+  - RULE-SET,TikTok / Domain,TikTok
+  - RULE-SET,Netflix / Domain,Netflix
+  - RULE-SET,Netflix / IP,Netflix,no-resolve
+  - DOMAIN-KEYWORD,netflix,Netflix
+  - RULE-SET,Disney / Domain,节点选择
+  - RULE-SET,Amazon / Domain,节点选择
+  - RULE-SET,Crunchyroll / Domain,节点选择
+  - RULE-SET,Popcorn / Domain,节点选择
+  - RULE-SET,HBO / Domain,节点选择
+  - RULE-SET,Spotify / Domain,Spotify
+  - RULE-SET,Steam / Domain,节点选择
+  - RULE-SET,Epic / Domain,节点选择
+  - RULE-SET,EA / Domain,节点选择
+  - RULE-SET,Blizzard / Domain,节点选择
+  - RULE-SET,UBI / Domain,节点选择
+  - RULE-SET,PlayStation / Domain,节点选择
+  - RULE-SET,Nintendo / Domain,节点选择
+  - RULE-SET,Google / Domain,谷歌服务
+  - RULE-SET,Google / IP,谷歌服务,no-resolve
+  - RULE-SET,Nvidia / Domain,节点选择
+  - RULE-SET,Proxy / Domain,节点选择
+  - RULE-SET,Globe / Domain,节点选择
+  - RULE-SET,Direct / Domain,全局直连
+  - RULE-SET,China / Domain,全局直连
+  - RULE-SET,China / IP,全局直连,no-resolve
+  - RULE-SET,Private / Domain,全局直连
+  - MATCH,漏网之鱼
 
-  - "GEOSITE,private,🎯 全球直连"
-  - "GEOIP,private,🎯 全球直连,no-resolve"
-  - "RULE-SET,Custom_Direct_Domain,🎯 全球直连"
-  - "RULE-SET,Custom_Direct_IP,🎯 全球直连,no-resolve"
-  - "RULE-SET,Custom_Direct_Port,🎯 全球直连"
-  - "RULE-SET,Custom_Proxy_Domain,🚀 故障转移"
-  - "RULE-SET,Custom_Proxy_IP,🚀 故障转移,no-resolve"
-  - "GEOSITE,google-cn,🎯 全球直连"
-  - "GEOSITE,category-games@cn,🎯 全球直连"
-  - "RULE-SET,Steam_CDN_Domain,🎯 全球直连"
-  - "RULE-SET,Steam_CDN_IP,🎯 全球直连,no-resolve"
-  - "GEOSITE,category-game-platforms-download,🎯 全球直连"
-  - "GEOSITE,category-public-tracker,🎯 全球直连"
-  - "GEOSITE,category-communication,💬 即时通讯"
-  - "GEOSITE,category-social-media-!cn,🌐 社交媒体"
-  - "GEOSITE,openai,🤖 ChatGPT"
-  - "GEOSITE,category-ai-!cn,🤖 AI服务"
-  - "GEOSITE,github,🚀 GitHub"
-  - "GEOSITE,category-speedtest,🚀 测速工具"
-  - "GEOSITE,steam,🎮 Steam"
-  - "GEOSITE,youtube,📹 YouTube"
-  - "GEOSITE,apple-tvplus,🎥 AppleTV+"
-  - "GEOSITE,apple,🍎 苹果服务"
-  - "GEOSITE,microsoft,Ⓜ️ 微软服务"
-  - "GEOSITE,googlefcm,📢 谷歌FCM"
-  - "GEOSITE,google,🇬 谷歌服务"
-  - "GEOSITE,tiktok,🎶 TikTok"
-  - "GEOSITE,netflix,🎥 Netflix"
-  - "GEOSITE,disney,🎥 DisneyPlus"
-  - "GEOSITE,hbo,🎥 HBO"
-  - "GEOSITE,primevideo,🎥 PrimeVideo"
-  - "GEOSITE,category-emby,🎥 Emby"
-  - "GEOSITE,spotify,🎻 Spotify"
-  - "GEOSITE,bahamut,📺 Bahamut"
-  - "GEOSITE,category-games,🎮 游戏平台"
-  - "GEOSITE,category-entertainment,🌎 国外媒体"
-  - "GEOSITE,category-ecommerce,🛒 国外电商"
-  - "GEOSITE,gfw,🚀 故障转移"
-  - "GEOIP,telegram,💬 即时通讯,no-resolve"
-  - "GEOIP,twitter,🌐 社交媒体,no-resolve"
-  - "GEOIP,facebook,🌐 社交媒体,no-resolve"
-  - "GEOIP,google,🇬 谷歌服务,no-resolve"
-  - "GEOIP,netflix,🎥 Netflix,no-resolve"
-  # ===== 远程规则集（目标已映射到现有策略组）=====
-  - "RULE-SET,Test / Domain,🚀 测速工具"
-  - "RULE-SET,Block / Domain,REJECT"
-  - "RULE-SET,ChatGPT / Domain,🤖 ChatGPT"
-  - "RULE-SET,Claude / Domain,🤖 AI服务"
-  - "RULE-SET,Meta AI / Domain,🤖 AI服务"
-  - "RULE-SET,Perplexity / Domain,🤖 AI服务"
-  - "RULE-SET,Copilot / Domain,🤖 AI服务"
-  - "RULE-SET,Gemini / Domain,🤖 AI服务"
-  - "RULE-SET,Groq / Domain,🤖 AI服务"
-  - "RULE-SET,Grok / Domain,🤖 AI服务"
-  - "RULE-SET,Reddit / Domain,🌐 社交媒体"
-  - "RULE-SET,GitHub / Domain,🚀 GitHub"
-  - "RULE-SET,Telegram / Domain,💬 即时通讯"
-  - "RULE-SET,Telegram / IP,💬 即时通讯,no-resolve"
-  - "RULE-SET,WhatsApp / Domain,💬 即时通讯"
-  - "RULE-SET,Facebook / Domain,🌐 社交媒体"
-  - "RULE-SET,Apple / Domain,🍎 苹果服务"
-  - "RULE-SET,Apple-CN / Domain,🍎 苹果服务"
-  - "RULE-SET,Microsoft / Domain,Ⓜ️ 微软服务"
-  - "RULE-SET,OKX / Domain,🚀 故障转移"
-  - "RULE-SET,Bybit / Domain,🚀 故障转移"
-  - "RULE-SET,Binance / Domain,🚀 故障转移"
-  - "RULE-SET,BiliBili / Domain,🎯 全球直连"
-  - "RULE-SET,YouTube / Domain,📹 YouTube"
-  - "RULE-SET,TikTok / Domain,🎶 TikTok"
-  - "RULE-SET,Netflix / Domain,🎥 Netflix"
-  - "RULE-SET,Netflix / IP,🎥 Netflix,no-resolve"
-  - "DOMAIN-KEYWORD,netflix,🎥 Netflix"
-  - "RULE-SET,Disney / Domain,🎥 DisneyPlus"
-  - "RULE-SET,Amazon / Domain,🎥 PrimeVideo"
-  - "RULE-SET,Crunchyroll / Domain,🌎 国外媒体"
-  - "RULE-SET,Popcorn / Domain,🌎 国外媒体"
-  - "RULE-SET,HBO / Domain,🎥 HBO"
-  - "RULE-SET,Spotify / Domain,🎻 Spotify"
-  - "RULE-SET,Steam / Domain,🎮 Steam"
-  - "RULE-SET,Epic / Domain,🎮 游戏平台"
-  - "RULE-SET,EA / Domain,🎮 游戏平台"
-  - "RULE-SET,Blizzard / Domain,🎮 游戏平台"
-  - "RULE-SET,UBI / Domain,🎮 游戏平台"
-  - "RULE-SET,PlayStation / Domain,🎮 游戏平台"
-  - "RULE-SET,Nintendo / Domain,🎮 游戏平台"
-  - "RULE-SET,Google / Domain,🇬 谷歌服务"
-  - "RULE-SET,Google / IP,🇬 谷歌服务,no-resolve"
-  - "RULE-SET,Nvidia / Domain,🎮 游戏平台"
-  - "RULE-SET,Proxy / Domain,🚀 故障转移"
-  - "RULE-SET,Globe / Domain,🚀 故障转移"
-  - "RULE-SET,Direct / Domain,🎯 全球直连"
-  - "RULE-SET,China / Domain,🎯 全球直连"
-  - "RULE-SET,China / IP,🎯 全球直连,no-resolve"
-  - "RULE-SET,Private / Domain,🎯 全球直连"
-
-  - "GEOSITE,cn,🎯 全球直连"
-  - "GEOIP,cn,🎯 全球直连,no-resolve"
-  - "RULE-SET,Nonstandard_Port_Direct,🔀 非标端口"
-  - "MATCH,🐟 漏网之鱼"
-
+# ------------------------
+# 规则集提供者
+# ------------------------
 rule-providers:
-  Nonstandard_Port_Direct:
-    behavior: classical
-    interval: 28800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"
-    format: yaml
-  Custom_Direct_Domain:
-    behavior: domain
-    interval: 1800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.mrs"
-    format: mrs
-  Custom_Direct_IP:
-    behavior: ipcidr
-    interval: 28800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_IP.mrs"
-    format: mrs
-  Custom_Direct_Port:
-    behavior: classical
-    interval: 28800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_Port.yaml"
-    format: yaml
-  Custom_Proxy_Domain:
-    behavior: domain
-    interval: 28800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.mrs"
-    format: mrs
-  Custom_Proxy_IP:
-    behavior: ipcidr
-    interval: 28800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_IP.mrs"
-    format: mrs
-  Steam_CDN_Domain:
-    behavior: domain
-    interval: 28800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Steam_CDN_Domain.mrs"
-    format: mrs
-  Steam_CDN_IP:
-    behavior: ipcidr
-    interval: 28800
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Steam_CDN_IP.mrs"
-    format: mrs
-
-  # ----- 远程规则集补充（自包含，无锚点依赖）-----
   Test / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Check.list"}
-  Block / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Block.list"}
   ChatGPT / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/openai.mrs"}
   Claude / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Claude/Claude.list"}
   Meta AI / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/MetaAi.list"}
   Perplexity / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/perplexity.mrs"}
   Copilot / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Copilot.list"}
   Gemini / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Gemini.list"}
-  Groq / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/groq.mrs"}
-  Grok / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Grok.list"}
-  Reddit / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/reddit.mrs"}
   GitHub / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/github.mrs"}
   Telegram / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/telegram.mrs"}
   Telegram / IP: {type: http, interval: 86400, behavior: ipcidr, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/telegram.mrs"}
   WhatsApp / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Whatsapp/Whatsapp.list"}
   Facebook / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/facebook.mrs"}
-  Apple / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/apple.mrs"}
+  Amazon / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/amazon.mrs"}
   Apple-CN / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/apple-cn.mrs"}
+  Apple / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/apple.mrs"}
   Microsoft / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/microsoft.mrs"}
   OKX / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/okx.mrs"}
   Bybit / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/bybit.mrs"}
   Binance / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/binance.mrs"}
-  BiliBili / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/bilibili.mrs"}
-  YouTube / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/youtube.mrs"}
   TikTok / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/tiktok.mrs"}
   Netflix / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/netflix.mrs"}
   Netflix / IP: {type: http, interval: 86400, behavior: ipcidr, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/netflix.mrs"}
   Disney / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/disney.mrs"}
-  Amazon / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/amazon.mrs"}
-  Crunchyroll / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Crunchyroll.list"}
-  Popcorn / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Popcorn.list"}
   HBO / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/hbo.mrs"}
   Spotify / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/spotify.mrs"}
   Steam / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/steam.mrs"}
@@ -5451,16 +5481,23 @@ rule-providers:
   UBI / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/UBI/UBI.list"}
   PlayStation / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/PlayStation/PlayStation.list"}
   Nintendo / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Nintendo/Nintendo.list"}
-  Google / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/google.mrs"}
-  Google / IP: {type: http, interval: 86400, behavior: ipcidr, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/google.mrs"}
-  Nvidia / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Nvidia/Nvidia.list"}
   Proxy / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Proxy.list"}
   Globe / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Global/Global.list"}
+  Block / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Block.list"}
+  Nvidia / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Nvidia/Nvidia.list"}
+  Crunchyroll / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Crunchyroll.list"}
+  Reddit / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/reddit.mrs"}
+  Groq / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/groq.mrs"}
+  Grok / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Grok.list"}
+  Popcorn / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Popcorn.list"}
   Direct / Domain: {type: http, interval: 86400, behavior: classical, format: text, url: "https://fastly.jsdelivr.net/gh/liandu2024/clash@main/list/Direct.list"}
   Private / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/private.mrs"}
   China / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/cn.mrs"}
-  China / IP: {type: http, interval: 86400, behavior: ipcidr, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/cn.mrs"}\`;
-
+  China / IP: {type: http, interval: 86400, behavior: ipcidr, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/cn.mrs"}
+  YouTube / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/youtube.mrs"}
+  Google / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/google.mrs"}
+  Google / IP: {type: http, interval: 86400, behavior: ipcidr, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geoip/google.mrs"}
+  BiliBili / Domain: {type: http, interval: 86400, behavior: domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/bilibili.mrs"}\`;
         document.getElementById('out-full').innerText = lastGeneratedYaml;
         statusMsg.innerText = '✅ 链式代理配置文件已生成！';
 
