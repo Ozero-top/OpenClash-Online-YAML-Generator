@@ -1953,17 +1953,17 @@ mode: rule
 log-level: info
 external-controller: 127.0.0.1:9090
 secret: "\${secret}"
-ipv6: true
+ipv6: false
 unified-delay: true
 tcp-concurrent: true\`;
 
 const YAML_DNS_BLOCK = \`dns:
   enable: true
   listen: 0.0.0.0:7874
-  ipv6: true
+  ipv6: false
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
-  respect-rules: true 
+  respect-rules: false
   fake-ip-filter-mode: blacklist
   fake-ip-filter:
     - +.lan
@@ -2005,19 +2005,12 @@ const YAML_DNS_BLOCK = \`dns:
     - 223.5.5.5
     - 119.29.29.29
     
-  nameserver-policy:
-    "geosite:cn,private":
-      - 223.5.5.5
-      - 119.29.29.29
-      - https://dns.alidns.com/dns-query
-      - https://doh.pub/dns-query
-    "geosite:geolocation-!cn":
-      - https://dns.google/dns-query
-      - https://1.1.1.1/dns-query
-
   nameserver:
     - 223.5.5.5
-    - 119.29.29.29\`;
+    - 119.29.29.29
+  fallback:
+    - https://dns.google/dns-query
+    - https://1.1.1.1/dns-query\`;
 
 const YAML_TUN_BLOCK = \`tun:
   enable: true
@@ -3691,11 +3684,11 @@ proxy-groups:
   - name: 所有-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000          
     use:
 \${useProvidersForGroups}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     exclude-filter: "直连|拒绝" 
     use-provider-health: true
@@ -3703,7 +3696,7 @@ proxy-groups:
   - name: 香港-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000          
     proxies:
       - 香港-自动          
@@ -3716,11 +3709,11 @@ proxy-groups:
   - name: 香港-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000          
     use:
 \${useProvidersForGroups}
-    tolerance: 30
+    tolerance: 50
     lazy: true                
     filter: "广港|香港|HK|Hong Kong|🇭🇰|HongKong"
     use-provider-health: true
@@ -3728,7 +3721,7 @@ proxy-groups:
   - name: 台湾-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     proxies:
       - 台湾-自动          
@@ -3741,11 +3734,11 @@ proxy-groups:
   - name: 台湾-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     use:
 \${useProvidersForGroups}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     filter: "广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan"
     use-provider-health: true
@@ -3753,7 +3746,7 @@ proxy-groups:
   - name: 日本-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     proxies:
       - 日本-自动          
@@ -3766,11 +3759,11 @@ proxy-groups:
   - name: 日本-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     use:
 \${useProvidersForGroups}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     filter: "广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan"
     use-provider-health: true
@@ -3778,7 +3771,7 @@ proxy-groups:
   - name: 新加坡-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     proxies:
       - 新加坡-自动        
@@ -3791,11 +3784,11 @@ proxy-groups:
   - name: 新加坡-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     use:
 \${useProvidersForGroups}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     filter: "广新|新加坡|SG|坡|狮城|🇸🇬|Singapore"
     use-provider-health: true
@@ -3803,7 +3796,7 @@ proxy-groups:
   - name: 韩国-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     proxies:
       - 韩国-自动          
@@ -3816,11 +3809,11 @@ proxy-groups:
   - name: 韩国-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     use:
 \${useProvidersForGroups}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     filter: "广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea"
     use-provider-health: true
@@ -3828,7 +3821,7 @@ proxy-groups:
   - name: 美国-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     proxies:
       - 美国-自动          
@@ -3841,11 +3834,11 @@ proxy-groups:
   - name: 美国-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     use:
 \${useProvidersForGroups}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     filter: "广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States"
     use-provider-health: true
@@ -3853,7 +3846,7 @@ proxy-groups:
   - name: 英国-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     proxies:
       - 英国-自动          
@@ -3866,11 +3859,11 @@ proxy-groups:
   - name: 英国-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     use:
 \${useProvidersForGroups}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     filter: "英国|英|伦敦|UK|United Kingdom|🇬🇧|London"
     use-provider-health: true
@@ -3878,7 +3871,7 @@ proxy-groups:
   - name: 其他-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     proxies:
       - 其他-自动          
@@ -3891,11 +3884,11 @@ proxy-groups:
   - name: 其他-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     use:
 \${useProvidersForGroups}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     filter: "^((?!(直连|拒绝|广港|香港|HK|Hong Kong|🇭🇰|HongKong|广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan|广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|广新|新加坡|SG|坡|狮城|🇸🇬|Singapore|广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|英国|UK|United Kingdom|伦敦|英|London|🇬🇧)).)*$"
     use-provider-health: true
@@ -4408,11 +4401,11 @@ proxy-groups:
   - name: 所有-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000          
     use:
       - \${subName}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     exclude-filter: "直连|拒绝" 
     use-provider-health: true
@@ -4420,7 +4413,7 @@ proxy-groups:
   - name: 香港-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000          
     proxies:
       - 香港-自动          
@@ -4433,11 +4426,11 @@ proxy-groups:
   - name: 香港-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000          
     use:
       - \${subName}
-    tolerance: 30
+    tolerance: 50
     lazy: true                
     filter: "广港|香港|HK|Hong Kong|🇭🇰|HongKong"
     use-provider-health: true
@@ -4445,7 +4438,7 @@ proxy-groups:
   - name: 台湾-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     proxies:
       - 台湾-自动          
@@ -4458,11 +4451,11 @@ proxy-groups:
   - name: 台湾-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     use:
       - \${subName}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     filter: "广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan"
     use-provider-health: true
@@ -4470,7 +4463,7 @@ proxy-groups:
   - name: 日本-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     proxies:
       - 日本-自动          
@@ -4483,11 +4476,11 @@ proxy-groups:
   - name: 日本-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     use:
       - \${subName}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     filter: "广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan"
     use-provider-health: true
@@ -4495,7 +4488,7 @@ proxy-groups:
   - name: 新加坡-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     proxies:
       - 新加坡-自动        
@@ -4508,11 +4501,11 @@ proxy-groups:
   - name: 新加坡-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     use:
       - \${subName}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     filter: "广新|新加坡|SG|坡|狮城|🇸🇬|Singapore"
     use-provider-health: true
@@ -4520,7 +4513,7 @@ proxy-groups:
   - name: 韩国-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     proxies:
       - 韩国-自动          
@@ -4533,11 +4526,11 @@ proxy-groups:
   - name: 韩国-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     use:
       - \${subName}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     filter: "广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea"
     use-provider-health: true
@@ -4545,7 +4538,7 @@ proxy-groups:
   - name: 美国-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     proxies:
       - 美国-自动          
@@ -4558,11 +4551,11 @@ proxy-groups:
   - name: 美国-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     use:
       - \${subName}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     filter: "广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States"
     use-provider-health: true
@@ -4570,7 +4563,7 @@ proxy-groups:
   - name: 英国-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     proxies:
       - 英国-自动          
@@ -4583,11 +4576,11 @@ proxy-groups:
   - name: 英国-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     use:
       - \${subName}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     filter: "英国|英|伦敦|UK|United Kingdom|🇬🇧|London"
     use-provider-health: true
@@ -4595,7 +4588,7 @@ proxy-groups:
   - name: 其他-故转
     type: fallback
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     proxies:
       - 其他-自动          
@@ -4608,11 +4601,11 @@ proxy-groups:
   - name: 其他-自动
     type: url-test
     url: https://www.gstatic.com/generate_204
-    interval: 300
+    interval: 1200
     timeout: 3000
     use:
       - \${subName}
-    tolerance: 30
+    tolerance: 50
     lazy: true
     filter: "^((?!(直连|拒绝|广港|香港|HK|Hong Kong|🇭🇰|HongKong|广台|台湾|台灣|TW|Tai Wan|🇹🇼|🇨🇳|TaiWan|Taiwan|广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|广新|新加坡|SG|坡|狮城|🇸🇬|Singapore|广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|英国|UK|United Kingdom|伦敦|英|London|🇬🇧)).)*$"
     use-provider-health: true
