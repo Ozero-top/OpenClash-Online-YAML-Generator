@@ -316,7 +316,7 @@ export default {
       return s;
     }
 
-    // 读取 country/city，并立即转为中文（/api/visit 响应使用）
+    // 读取 country/city，并立即转为中文（用于 /api/visit 响应）
     const country = toCnCountry(request.cf?.country || "未知国家");
     const city = toCnCity(request.cf?.city || request.cf?.region || "未知地区");
 
@@ -345,77 +345,20 @@ export default {
     // ===== 三页共享 HTML/JS 片段（无 ${} 模板插值，可安全注入外层模板字符串） =====
     const SHARED_HEAD_META = `<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0f1419" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#f7f9fc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#E9EEF5">
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',t==='dark'?'#171D2C':'#E9EEF5');}}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">`;
 
-    const SHARED_THEME_INIT_SCRIPT = `<script>
-// 主题初始化 + 切换（优先 localStorage，否则跟随系统）
-(function(){
-  try {
-    var root = document.documentElement;
-    var saved = null;
-    try { saved = localStorage.getItem('theme'); } catch(_) {}
-    var mqDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
-    function resolveDefaultTheme() {
-      if (mqDark && mqDark.matches) return 'dark';
-      return 'light';
-    }
-    function applyTheme(theme) {
-      if (theme === 'light' || theme === 'dark') {
-        root.setAttribute('data-theme', theme);
-      } else {
-        root.removeAttribute('data-theme');
-      }
-      var btn = document.getElementById('themeToggleBtn');
-      if (btn) {
-        var effective = theme || (resolveDefaultTheme());
-        btn.textContent = (effective === 'dark') ? '🌞' : '🌙';
-        btn.title = (effective === 'dark') ? '切换到浅色主题' : '切换到深色主题';
-      }
-    }
-    var initialTheme = (saved === 'light' || saved === 'dark') ? saved : '';
-    applyTheme(initialTheme);
-    function bindBtn() {
-      var btn = document.getElementById('themeToggleBtn');
-      if (!btn) return;
-      btn.addEventListener('click', function() {
-        var current = root.getAttribute('data-theme') || (resolveDefaultTheme());
-        var next = (current === 'dark') ? 'light' : 'dark';
-        try { localStorage.setItem('theme', next); } catch(_) {}
-        applyTheme(next);
-      });
-    }
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', bindBtn);
-    } else {
-      bindBtn();
-    }
-    if ((!saved || saved !== 'light' && saved !== 'dark') && mqDark && typeof mqDark.addEventListener === 'function') {
-      mqDark.addEventListener('change', function() {
-        root.removeAttribute('data-theme');
-        applyTheme('');
-      });
-    }
-  } catch (_) {}
-})();
-</script>`;
-
-    const SHARED_TRACK_SCRIPT = `<script>
-// 操作追踪已禁用（后端记录功能已移除），保留空函数避免前端 onclick 调用报错
-function trackAction(actionName, extra) { /* no-op */ }
-</script>`;
-
-    // 内部帮助函数：统计独立访客数（仅计数，不再写访问日志/去重标记）
-    // - path/actionDirect 参数保留以兼容现有调用点，但不再使用
-    // - 30 天窗口内同 IP 只计数一次
-    async function recordVisit(path, actionDirect) {
+    // 内部帮助函数：记录一次访问（实时在线心跳 + 30 天独立访客计数）
+    async function recordVisit() {
       if (!env || !env.PAGE_VISITS) return 0;
       try {
+        // 0. 实时在线心跳：任意记录行为刷新在线标记（2 分钟内活跃视为在线）
+        await env.PAGE_VISITS.put(`online:${clientIp}`, "1", { expirationTtl: 120 }).catch(() => {});
+        // 1. IP 独立访客计数（30 天窗口）
         const TTL_30_DAYS = 30 * 24 * 60 * 60;
-        // IP 独立访客计数（30 天窗口）
         const hasVisited = await env.PAGE_VISITS.get(`ip:${clientIp}`);
         let currentCount = parseInt((await env.PAGE_VISITS.get("total_unique_visitors")) || "0", 10);
         if (!hasVisited) {
@@ -429,16 +372,23 @@ function trackAction(actionName, extra) { /* no-op */ }
         return 0;
       }
     }
-
-    // 1. 提供异步获取 IP 与独立访问计数的 API
+    // 提供异步获取 IP 与独立访问计数的 API
     if (url.pathname === "/api/visit") {
       if (request.method !== "GET") return methodNotAllowedResponse("GET");
       let visitCount = 0;
       let kvBound = false;
+      let onlineCount = 0;
 
       if (env && env.PAGE_VISITS) {
         kvBound = true;
-        visitCount = await recordVisit("/api/visit");
+        visitCount = await recordVisit();
+        // 统计实时在线人数：列出 2 分钟内有过心跳的 IP 标记
+        try {
+          const onlineList = await env.PAGE_VISITS.list({ prefix: "online:" });
+          onlineCount = (onlineList && onlineList.keys) ? onlineList.keys.length : 0;
+        } catch (onlineErr) {
+          console.warn("在线人数统计失败:", onlineErr);
+        }
       }
 
       return new Response(JSON.stringify({
@@ -446,6 +396,7 @@ function trackAction(actionName, extra) { /* no-op */ }
         country: country,
         city: city,
         visitCount: visitCount,
+        onlineCount: onlineCount,
         kvBound: kvBound
       }), {
         headers: withSecurityHeaders({ "Content-Type": "application/json;charset=UTF-8" })
@@ -461,6 +412,8 @@ function trackAction(actionName, extra) { /* no-op */ }
       const rawIp = (url.searchParams.get("ip") || "").trim();
       const extraCtx = (url.searchParams.get("ctx") || "").trim(); // 附加上下文：sni/host/锚点名等全部文本
       const target = rawHost || rawIp;
+
+      ctx.waitUntil(recordVisit());
 
       if (!target) {
         return new Response(JSON.stringify({ ok: false, error: "缺少 host 或 ip 参数", label: "通用" }), {
@@ -1148,142 +1101,80 @@ function trackAction(actionName, extra) { /* no-op */ }
       });
     }
 
-    // 默认前端主页访客计数
-    await recordVisit("/");
+    // 默认前端主页访问记录
+    await recordVisit();
 
     // 2. 返回 HTML 页面
     const html = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     ${SHARED_HEAD_META}
-    <title> OpenClash YAML规则文件一键生成工具 </title>
+    <title> OpenClash(.yaml)规则文件一键生成工具 </title>
     <style>
         :root {
-            --bg-color: #0f1419;
-            --card-bg: rgba(22, 28, 38, 0.85);
-            --card-border: rgba(82, 199, 235, 0.2);
-            --primary: #4dd0e1;
-            --primary-glow: rgba(77, 208, 225, 0.28);
-            --secondary: #9575fd;
-            --secondary-glow: rgba(149, 117, 253, 0.22);
-            --text-main: #e8edf2;
-            --text-muted: #8a95a8;
-            --input-bg: rgba(13, 18, 25, 0.85);
-            --input-border: rgba(82, 199, 235, 0.25);
-            --success: #34d399;
-            --success-glow: rgba(52, 211, 153, 0.28);
-            --warning: #fbbf24;
-            --warning-glow: rgba(251, 191, 36, 0.28);
-            --danger: #f87171;
-            --danger-glow: rgba(248, 113, 113, 0.28);
-            --header-divider: rgba(255, 255, 255, 0.08);
-            --card-shadow-color: rgba(0, 0, 0, 0.45);
-            --gradient-1: rgba(149, 117, 253, 0.14);
-            --gradient-2: rgba(77, 208, 225, 0.12);
-            --text-strong: #f5f8fb;
-            --btn-text-on-primary: #0f1419;
-            --btn-text-dark-on-primary: #0f1419;
-            --mode-desc-color: #b8a4ff;
-            --mode-desc-bg: rgba(149, 117, 253, 0.06);
-            --mode-desc-border: rgba(149, 117, 253, 0.25);
-            --stats-bg: rgba(77, 208, 225, 0.06);
-            --output-bg: #0a0f16;
-            --output-color: #34d399;
-            --output-shadow: rgba(0, 0, 0, 0.75);
-            --option-bg: #0f1419;
-            --node-card-bg: rgba(255, 255, 255, 0.03);
-            --btn-add-node-bg: rgba(255, 255, 255, 0.05);
-            --mode-btn-bg: rgba(255, 255, 255, 0.03);
-            --download-btn-bg: rgba(77, 208, 225, 0.08);
-        }
-        /* 浅色主题（用户手动切换） */
-        :root[data-theme="light"] {
-            --bg-color: #f7f9fc;
-            --card-bg: rgba(255, 255, 255, 0.92);
-            --card-border: rgba(14, 116, 144, 0.18);
-            --primary: #0e7490;
-            --primary-glow: rgba(14, 116, 144, 0.22);
-            --secondary: #7c3aed;
-            --secondary-glow: rgba(124, 58, 237, 0.18);
-            --text-main: #1f2937;
-            --text-muted: #64748b;
-            --input-bg: rgba(255, 255, 255, 0.95);
-            --input-border: rgba(14, 116, 144, 0.24);
-            --success: #059669;
-            --success-glow: rgba(5, 150, 105, 0.22);
-            --warning: #d97706;
-            --warning-glow: rgba(217, 119, 6, 0.24);
-            --danger: #dc2626;
-            --danger-glow: rgba(220, 38, 38, 0.22);
-            --header-divider: rgba(15, 23, 42, 0.08);
-            --card-shadow-color: rgba(15, 23, 42, 0.1);
-            --gradient-1: rgba(124, 58, 237, 0.06);
-            --gradient-2: rgba(14, 116, 144, 0.06);
-            --text-strong: #0f172a;
-            --btn-text-on-primary: #ffffff;
-            --btn-text-dark-on-primary: #f7f9fc;
-            --mode-desc-color: #6d28d9;
-            --mode-desc-bg: rgba(124, 58, 237, 0.05);
-            --mode-desc-border: rgba(124, 58, 237, 0.22);
-            --stats-bg: rgba(14, 116, 144, 0.05);
-            --output-bg: #0a0f16;
-            --output-color: #059669;
-            --output-shadow: rgba(0, 0, 0, 0.3);
-            --option-bg: #ffffff;
-            --node-card-bg: rgba(15, 23, 42, 0.025);
-            --btn-add-node-bg: rgba(15, 23, 42, 0.04);
-            --mode-btn-bg: rgba(15, 23, 42, 0.025);
-            --download-btn-bg: rgba(14, 116, 144, 0.06);
-        }
-        /* 用户未手动选择时，自动跟随系统浅色模式 */
-        @media (prefers-color-scheme: light) {
-            :root:not([data-theme]) {
-                --bg-color: #f7f9fc;
-                --card-bg: rgba(255, 255, 255, 0.92);
-                --card-border: rgba(14, 116, 144, 0.18);
-                --primary: #0e7490;
-                --primary-glow: rgba(14, 116, 144, 0.22);
-                --secondary: #7c3aed;
-                --secondary-glow: rgba(124, 58, 237, 0.18);
-                --text-main: #1f2937;
-                --text-muted: #64748b;
-                --input-bg: rgba(255, 255, 255, 0.95);
-                --input-border: rgba(14, 116, 144, 0.24);
-                --success: #059669;
-                --success-glow: rgba(5, 150, 105, 0.22);
-                --warning: #d97706;
-                --warning-glow: rgba(217, 119, 6, 0.24);
-                --danger: #dc2626;
-                --danger-glow: rgba(220, 38, 38, 0.22);
-                --header-divider: rgba(15, 23, 42, 0.08);
-                --card-shadow-color: rgba(15, 23, 42, 0.1);
-                --gradient-1: rgba(124, 58, 237, 0.06);
-                --gradient-2: rgba(14, 116, 144, 0.06);
-                --text-strong: #0f172a;
-                --btn-text-on-primary: #ffffff;
-                --btn-text-dark-on-primary: #f7f9fc;
-                --mode-desc-color: #6d28d9;
-                --mode-desc-bg: rgba(124, 58, 237, 0.05);
-                --mode-desc-border: rgba(124, 58, 237, 0.22);
-                --stats-bg: rgba(14, 116, 144, 0.05);
-                --output-bg: #0a0f16;
-                --output-color: #059669;
-                --output-shadow: rgba(0, 0, 0, 0.3);
-                --option-bg: #ffffff;
-                --node-card-bg: rgba(15, 23, 42, 0.025);
-                --btn-add-node-bg: rgba(15, 23, 42, 0.04);
-                --mode-btn-bg: rgba(15, 23, 42, 0.025);
-                --download-btn-bg: rgba(14, 116, 144, 0.06);
-            }
+            --bg-base: #E9EEF5;
+            --surface: #EBEFF6;
+            --shadow-dark: rgba(163, 177, 198, 0.55);
+            --shadow-light: rgba(255, 255, 255, 0.95);
+            --raised: 8px 8px 18px var(--sd-base), -8px -8px 18px var(--sl-base);
+            --raised-sm: 5px 5px 12px var(--sd-mid), -5px -5px 12px var(--sl-mid);
+            --inset: inset 4px 4px 9px rgba(163, 177, 198, 0.42), inset -4px -4px 9px rgba(255, 255, 255, 0.92);
+            --primary: #5B7CFA;
+            --primary-deep: #3D5AF1;
+            --primary-soft: rgba(91, 124, 250, 0.12);
+            --secondary: #7B8FBF;
+            --secondary-deep: #55689B;
+            --secondary-soft: rgba(123, 143, 191, 0.12);
+            --accent: #C98A2D;
+            --accent-deep: #9A6B1F;
+            --accent-soft: #F5EBDA;
+            --accent-shadow: rgba(91, 124, 250, 0.35);
+            --text-main: #44536B;
+            --text-muted: #71809B;
+            --text-strong: #2C3A52;
+            --card-bg: #EBEFF6;
+            --card-border: rgba(255, 255, 255, 0.55);
+            --input-bg: #EBEFF6;
+            --input-border: rgba(255, 255, 255, 0.5);
+            --focus-ring: rgba(91, 124, 250, 0.25);
+            --header-divider: rgba(163, 177, 198, 0.3);
+            --success: #4CA97C;
+            --success-soft: rgba(76, 169, 124, 0.12);
+            --warning: #C98A2D;
+            --warning-soft: #F5EBDA;
+            --danger: #D96A6A;
+            --danger-soft: rgba(217, 106, 106, 0.12);
+            --mode-desc-color: #3D5AF1;
+            --mode-desc-bg: rgba(91, 124, 250, 0.08);
+            --mode-desc-border: rgba(91, 124, 250, 0.18);
+            --stats-bg: #EBEFF6;
+            --stats-border: rgba(255, 255, 255, 0.55);
+            --output-bg: #E4E9F2;
+            --output-color: #3A4A66;
+            --output-shadow: rgba(163, 177, 198, 0.35);
+            --option-bg: #FFFFFF;
+            --node-card-bg: #EBEFF6;
+            --btn-add-node-bg: #EBEFF6;
+            --mode-btn-bg: #EBEFF6;
+            --download-btn-bg: rgba(91, 124, 250, 0.1);
+            --btn-text-on-primary: #FFFFFF;
+            --btn-text-dark-on-primary: #FFFFFF;
+            --body-gradient: linear-gradient(135deg, #EFF3F9 0%, #E4EAF3 50%, #EDF1F7 100%);
+            --sd-base: rgba(163, 177, 198, 0.5);
+            --sl-base: rgba(255, 255, 255, 0.95);
+            --sd-strong: rgba(163, 177, 198, 0.55);
+            --sl-strong: rgba(255, 255, 255, 1);
+            --sd-mid: rgba(163, 177, 198, 0.45);
+            --sl-mid: rgba(255, 255, 255, 0.9);
+            --sd-soft: rgba(163, 177, 198, 0.4);
+            --btn-sub-color: #111111;
+            --quick-link-color: #3D5AF1;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
             padding: 24px;
-            background-color: var(--bg-color);
-            background-image:
-                radial-gradient(circle at 15% 15%, var(--gradient-1) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, var(--gradient-2) 0%, transparent 40%);
+            background: var(--body-gradient);
             background-attachment: fixed;
             color: var(--text-main);
             margin: 0;
@@ -1293,40 +1184,35 @@ function trackAction(actionName, extra) { /* no-op */ }
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             text-rendering: optimizeLegibility;
-            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .container {
             max-width: 1000px;
             margin: 0 auto;
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: var(--surface);
             padding: 28px;
-            border-radius: 16px;
+            border-radius: 28px;
             border: 1px solid var(--card-border);
-            box-shadow: 0 10px 40px 0 var(--card-shadow-color);
-            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: var(--raised);
         }
 
         /* 平板（含大屏竖屏 iPad）适配 */
         @media (max-width: 1024px) {
             body { padding: 18px; }
-            .container { padding: 22px; border-radius: 14px; }
-            .header-title-container h2 { font-size: 20px; }
+            .container { padding: 22px; border-radius: 22px; }
+            .hero h2 { font-size: 21px; }
         }
         /* 手机适配 */
         @media (max-width: 640px) {
             body { padding: 12px; }
-            .container { padding: 16px; border-radius: 12px; box-shadow: 0 6px 24px 0 var(--card-shadow-color); }
-            .header-title-container { flex-direction: column; align-items: stretch; gap: 12px; padding-bottom: 14px; }
-            .header-title-container h2 { font-size: 18px; }
-            .header-right-tools { justify-content: space-between; width: 100%; gap: 8px; }
-            .ip-stats-badge { font-size: 11px; padding: 5px 10px; }
-            .quick-links-bar { justify-content: center; }
-            .quick-links-right { justify-content: center; width: 100%; }
-            .home-link { width: 100%; justify-content: center; }
-            .download-btn-link { padding: 8px 12px; font-size: 12px; }
+            .container { padding: 16px; border-radius: 18px; box-shadow: var(--raised-sm); }
+            .hero { padding-top: 6px; }
+            .hero h2 { font-size: 18px; margin-bottom: 14px; }
+            .hero-logo { height: 22px; width: 22px; vertical-align: -4px; }
+            .hero-sub { font-size: 12px; }
+            .ip-stats-badge { font-size: 11px; padding: 5px 10px; flex-wrap: wrap; justify-content: center; row-gap: 2px; }
+            .download-btn-link.home-link { width: 100%; justify-content: center; }
+            .download-btn-link { padding: 10px 12px; font-size: 12px; }
             .mode-btn-group { flex-direction: column; }
             .mode-btn { width: 100%; min-height: 48px; }
             .row { flex-direction: column !important; gap: 8px !important; }
@@ -1340,12 +1226,13 @@ function trackAction(actionName, extra) { /* no-op */ }
         @media (max-width: 380px) {
             body { padding: 8px; }
             .container { padding: 12px; }
-            .header-title-container h2 { font-size: 16px; }
+            .hero h2 { font-size: 16px; }
+            .step-card { padding: 14px 12px 14px; border-radius: 18px; }
+            .step-title { font-size: 14px; }
             .ip-stats-badge { font-size: 10px; padding: 4px 8px; }
         }
         /* 触控设备：增大可点击区域 */
         @media (pointer: coarse) {
-            .theme-toggle-btn { width: 40px; height: 40px; }
             .download-btn-link { min-height: 40px; }
             .btn-main, .btn-clear, .btn-lookup { min-height: 48px; }
         }
@@ -1354,66 +1241,96 @@ function trackAction(actionName, extra) { /* no-op */ }
             *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
         }
         
-        .header-title-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--header-divider);
-            padding-bottom: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .header-title-container h2 {
-            margin: 0;
-            color: var(--primary);
-            font-size: 22px;
-            border-bottom: none;
-            padding-bottom: 0;
-            text-shadow: 0 0 12px var(--primary-glow);
+        /* Hero 区：标题置顶居中，与统计行保留呼吸间距 */
+        .hero { text-align: center; padding: 10px 8px 4px; }
+        .hero h2 {
+            margin: 0 0 20px;
+            color: var(--text-strong);
+            font-size: 26px;
             letter-spacing: 0.5px;
         }
+        .hero-sub { color: var(--text-muted); font-size: 13px; white-space: nowrap; }
+        .hero-logo {
+            height: 30px;
+            width: 30px;
+            vertical-align: -6px;
+            border-radius: 50%;
+            margin-right: 2px;
+        }
+        /* 深色下 logo 加光晕，避免深色图案融入背景 */
+        html[data-theme="dark"] .hero-logo {
+            box-shadow:
+                0 0 0 1.5px rgba(102, 217, 160, 0.55),
+                0 0 12px rgba(102, 217, 160, 0.5),
+                0 0 28px rgba(102, 217, 160, 0.22);
+        }
+        @media (prefers-color-scheme: dark) {
+            html:not([data-theme="light"]) .hero-logo {
+                box-shadow:
+                    0 0 0 1.5px rgba(102, 217, 160, 0.55),
+                    0 0 12px rgba(102, 217, 160, 0.5),
+                    0 0 28px rgba(102, 217, 160, 0.22);
+            }
+        }
+        .hero-tools { display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; }
 
-        .header-right-tools { display: flex; align-items: center; gap: 12px; }
-        
-        .theme-toggle-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
+        /* 三段步骤卡片 */
+        .step-card {
+            background: var(--surface);
             border: 1px solid var(--card-border);
-            background: var(--stats-bg);
-            color: var(--primary);
-            cursor: pointer;
-            font-size: 16px;
+            border-radius: 24px;
+            padding: 18px 20px 20px;
+            margin-top: 22px;
+            box-shadow: var(--raised-sm);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+        /* 悬浮光晕：浮雕阴影加深 + 主色柔光扩散 */
+        .step-card:hover {
+            transform: translateY(-3px);
+            box-shadow:
+                9px 9px 20px var(--sd-strong),
+                -9px -9px 20px var(--sl-strong),
+                0 0 0 1px rgba(91, 124, 250, 0.2),
+                0 0 30px rgba(91, 124, 250, 0.3),
+                0 0 64px rgba(91, 124, 250, 0.14);
+        }
+        .step-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            color: var(--text-strong);
+            margin-bottom: 14px;
+        }
+        .step-badge {
+            width: 26px;
+            height: 26px;
+            flex: 0 0 auto;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
-            font-family: inherit;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6B89FF 0%, #3D5AF1 100%);
+            color: #FFFFFF;
+            font-size: 13px;
+            box-shadow: 0 6px 14px var(--accent-shadow);
         }
-        .theme-toggle-btn:hover {
-            background: var(--primary);
-            color: var(--btn-text-on-primary);
-            box-shadow: 0 0 12px var(--primary-glow);
-            transform: scale(1.05);
-        }
-
+        
         .ip-stats-badge {
-            background: var(--stats-bg);
+            background: var(--surface);
             border: 1px solid var(--card-border);
-            color: var(--primary);
-            padding: 6px 12px;
-            border-radius: 8px;
+            color: var(--accent-deep);
+            padding: 6px 14px;
+            border-radius: 999px;
             font-size: 12px;
             display: inline-flex;
             align-items: center;
             gap: 8px;
             font-weight: 500;
-            box-shadow: inset 0 0 10px var(--stats-bg);
-            transition: all 0.3s ease;
+            box-shadow: var(--inset);
         }
-        .ip-stats-badge strong { color: var(--text-strong); text-shadow: 0 0 8px var(--card-shadow-color); }
+        .ip-stats-badge strong { color: var(--text-strong); }
         /* 当前访问 IP：默认打码，可点击切换显隐 */
         #userIp {
             cursor: pointer;
@@ -1441,46 +1358,49 @@ function trackAction(actionName, extra) { /* no-op */ }
             vertical-align: middle;
         }
         
-        .github-link { color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; text-decoration: none; transition: all 0.3s; }
-        .github-link:hover { color: var(--primary); filter: drop-shadow(0 0 8px var(--primary-glow)); transform: scale(1.05); }
-        
-        .section-header-box { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        .github-link { color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; text-decoration: none; transition: transform 0.18s ease, color 0.18s ease; }
+        .github-link:hover { color: var(--accent-deep); transform: scale(1.08); }
 
-        .quick-links-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 0; margin-bottom: 14px; justify-content: space-between; align-items: center; }
-        .quick-links-right { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
-        .home-link { background: var(--primary); color: var(--btn-text-dark-on-primary); border-color: var(--primary); font-weight: bold; }
-        .home-link:hover { background: var(--download-btn-bg); color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); border-color: var(--card-border); }
+        .quick-links-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; margin-bottom: 14px; justify-content: center; align-items: center; }
+        .quick-links-right { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 8px; flex: 1 1 auto; min-width: 0; justify-content: center; }
+        .download-btn-link.home-link { background: var(--primary); color: var(--btn-text-dark-on-primary); border-color: var(--primary); font-weight: bold; }
+        .download-btn-link.home-link:hover { background: var(--primary-deep); color: #FFFFFF; border-color: var(--primary-deep); transform: translateY(-1px); }
         
         .section-title {
             font-weight: bold;
             font-size: 15px;
-            color: var(--primary);
+            color: var(--text-strong);
             border-left: 4px solid var(--primary);
+            border-radius: 2px;
             padding-left: 10px;
             margin: 0;
-            text-shadow: 0 0 8px var(--primary-glow);
-            transition: color 0.3s ease, text-shadow 0.3s ease, border-color 0.3s ease;
         }
 
         .download-btn-link {
             font-size: 12px;
             font-weight: bold;
-            color: var(--primary);
-            background: var(--download-btn-bg);
+            color: var(--quick-link-color);
+            background: var(--surface);
             padding: 6px 12px;
-            border-radius: 6px;
+            border-radius: 999px;
             text-decoration: none;
             border: 1px solid var(--card-border);
-            transition: all 0.3s;
+            box-shadow: var(--raised-sm);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
+            text-align: center;
             gap: 4px;
         }
         .download-btn-link:hover {
-            background: var(--primary);
-            color: var(--btn-text-dark-on-primary);
-            box-shadow: 0 0 15px var(--primary-glow);
-            border-color: var(--primary);
+            color: var(--quick-link-color);
+            transform: translateY(-2px);
+            box-shadow: 7px 7px 16px var(--sd-strong), -7px -7px 16px var(--sl-strong);
+        }
+        .download-btn-link:active {
+            transform: translateY(1px);
+            box-shadow: var(--inset);
         }
 
         label { font-weight: 600; display: block; margin-top: 12px; margin-bottom: 6px; font-size: 13px; color: var(--text-main); }
@@ -1490,19 +1410,22 @@ function trackAction(actionName, extra) { /* no-op */ }
             box-sizing: border-box;
             padding: 10px 12px;
             background: var(--input-bg);
-            border: 1px solid var(--input-border);
-            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
             color: var(--text-strong);
             font-family: inherit;
             font-size: 13px;
-            transition: all 0.3s;
+            box-shadow: var(--inset);
+            transition: box-shadow 0.18s ease, color 0.18s ease;
         }
         textarea:focus, input:focus, select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 12px var(--primary-glow);
+            color: var(--text-strong);
+            box-shadow: var(--inset), 0 0 0 3px var(--focus-ring);
             outline: none;
         }
         select option { background: var(--option-bg); color: var(--text-strong); }
+        /* 节点协议链接输入框：默认高度提升为原 2 行的 1.5 倍，可纵向拉伸 */
+        .node-link { min-height: 80px; resize: vertical; }
 
         /* 国家选择 wrap：下拉模式 / 自定义输入模式 切换 */
         .country-wrap { display: flex; gap: 0; align-items: stretch; }
@@ -1511,11 +1434,14 @@ function trackAction(actionName, extra) { /* no-op */ }
         .country-custom .country-in { flex: 1; }
         .country-custom .country-back {
             flex: 0 0 auto; width: 36px; cursor: pointer;
-            background: var(--card-bg); color: var(--text-strong);
-            border: 1px solid var(--input-border); border-radius: 6px;
+            background: var(--surface); color: var(--text-strong);
+            border: 1px solid var(--card-border); border-radius: 10px;
             font-size: 13px;
+            box-shadow: var(--raised-sm);
+            transition: box-shadow 0.18s ease, transform 0.18s ease, color 0.18s ease;
         }
-        .country-custom .country-back:hover { border-color: var(--primary); color: var(--primary); }
+        .country-custom .country-back:hover { color: var(--primary-deep); transform: translateY(-1px); }
+        .country-custom .country-back:active { transform: translateY(1px); box-shadow: var(--inset); }
 
         .row { display: flex; gap: 12px; }
         .row > div { flex: 1; }
@@ -1529,49 +1455,51 @@ function trackAction(actionName, extra) { /* no-op */ }
             border: 1px solid var(--card-border);
             background: var(--mode-btn-bg);
             color: var(--text-muted);
-            border-radius: 8px;
+            border-radius: 999px;
             cursor: pointer;
             font-size: 13px;
             font-weight: bold;
-            transition: all 0.3s;
+            box-shadow: var(--raised-sm);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
             text-align: center;
         }
         .mode-btn.active {
-            background: linear-gradient(135deg, rgba(77, 208, 225, 0.18), rgba(149, 117, 253, 0.18));
-            border-color: var(--primary);
-            color: var(--primary);
-            box-shadow: 0 0 15px var(--primary-glow);
-            text-shadow: 0 0 8px var(--primary-glow);
-        }
-        :root[data-theme="light"] .mode-btn.active {
-            background: linear-gradient(135deg, rgba(14, 116, 144, 0.14), rgba(124, 58, 237, 0.14));
-            box-shadow: 0 0 14px var(--primary-glow);
+            background: linear-gradient(135deg, #6B89FF 0%, #3D5AF1 100%);
+            border-color: transparent;
+            color: #FFFFFF;
+            box-shadow:
+                0 8px 18px var(--accent-shadow),
+                4px 4px 10px var(--sd-soft),
+                -4px -4px 10px var(--sl-mid);
         }
         .mode-btn:hover:not(.active) {
-            border-color: var(--primary);
-            color: var(--text-main);
-            background: var(--stats-bg);
+            color: var(--text-strong);
+            transform: translateY(-2px);
+            box-shadow: 7px 7px 16px var(--sd-strong), -7px -7px 16px var(--sl-strong);
+        }
+        .mode-btn:active {
+            transform: translateY(1px);
+            box-shadow: var(--inset);
         }
 
         .mode-desc-box {
             background: var(--mode-desc-bg);
             border: 1px solid var(--mode-desc-border);
-            border-radius: 8px;
+            border-radius: 14px;
             padding: 14px 16px;
             margin-bottom: 20px;
             color: var(--mode-desc-color);
             font-size: 13px;
             line-height: 1.6;
-            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            box-shadow: var(--inset);
         }
         .mode-desc-box .highlight-badge {
             font-weight: bold;
-            color: var(--btn-text-dark-on-primary);
+            color: #FFFFFF;
             background: var(--primary);
-            padding: 2px 8px;
-            border-radius: 4px;
+            padding: 2px 9px;
+            border-radius: 999px;
             font-size: 12px;
-            box-shadow: 0 0 8px var(--primary-glow);
             display: inline-block;
             margin: 0 2px;
         }
@@ -1582,68 +1510,83 @@ function trackAction(actionName, extra) { /* no-op */ }
             flex: 2;
             min-width: 180px;
             padding: 12px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, #6B89FF 0%, #3D5AF1 100%);
             color: var(--btn-text-on-primary);
             border: none;
-            border-radius: 8px;
+            border-radius: 999px;
             cursor: pointer;
             font-size: 15px;
             font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 0 15px var(--primary-glow);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+            box-shadow:
+                0 8px 18px var(--accent-shadow),
+                4px 4px 10px var(--sd-soft),
+                -4px -4px 10px var(--sl-mid);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
         .btn-main:hover {
-            opacity: 0.9;
             transform: translateY(-2px);
-            box-shadow: 0 0 25px var(--primary-glow);
+            box-shadow:
+                0 12px 24px rgba(91, 124, 250, 0.45),
+                5px 5px 12px rgba(163, 177, 198, 0.45),
+                -5px -5px 12px rgba(255, 255, 255, 1);
+        }
+        .btn-main:active {
+            transform: translateY(1px);
+            box-shadow: inset 4px 4px 9px rgba(45, 66, 190, 0.45), inset -3px -3px 8px rgba(255, 255, 255, 0.25);
         }
 
         .btn-refresh {
             flex: 1;
             min-width: 130px;
             padding: 12px;
-            background: linear-gradient(135deg, var(--warning), #ff8800);
-            color: var(--btn-text-dark-on-primary);
-            border: none;
-            border-radius: 8px;
+            background: var(--surface);
+            color: var(--secondary-deep);
+            border: 1px solid var(--card-border);
+            border-radius: 999px;
             cursor: pointer;
             font-size: 15px;
             font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 0 15px var(--warning-glow);
+            box-shadow: var(--raised-sm);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
         }
         .btn-refresh:hover {
-            opacity: 0.9;
+            color: var(--text-strong);
             transform: translateY(-2px);
-            box-shadow: 0 0 20px var(--warning-glow);
+            box-shadow: 7px 7px 16px var(--sd-strong), -7px -7px 16px var(--sl-strong);
+        }
+        .btn-refresh:active {
+            transform: translateY(1px);
+            box-shadow: var(--inset);
         }
 
         .btn-sub {
             flex: 1;
             min-width: 130px;
             padding: 12px;
-            background: linear-gradient(135deg, var(--success), #00b874);
-            color: var(--btn-text-dark-on-primary);
-            border: none;
-            border-radius: 8px;
+            background: var(--surface);
+            color: var(--btn-sub-color);
+            border: 1px solid var(--card-border);
+            border-radius: 999px;
             cursor: pointer;
             font-size: 15px;
             font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 0 15px var(--success-glow);
+            box-shadow: var(--raised-sm);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
         .btn-sub:hover {
-            opacity: 0.9;
             transform: translateY(-2px);
-            box-shadow: 0 0 20px var(--success-glow);
+            box-shadow: 7px 7px 16px var(--sd-strong), -7px -7px 16px var(--sl-strong);
+        }
+        .btn-sub:active {
+            transform: translateY(1px);
+            box-shadow: var(--inset);
         }
         
         .output-box {
             background: var(--output-bg);
             color: var(--output-color);
             padding: 16px;
-            border-radius: 8px;
+            border-radius: 16px;
             font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace;
             word-break: break-all;
             margin-top: 15px;
@@ -1651,159 +1594,300 @@ function trackAction(actionName, extra) { /* no-op */ }
             font-size: 12px;
             max-height: 500px;
             overflow-y: auto;
-            border: 1px solid var(--card-border);
-            box-shadow: inset 0 0 15px var(--output-shadow);
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: var(--inset);
         }
 
         .tag {
-            background: rgba(77, 208, 225, 0.15);
-            color: var(--primary);
-            border: 1px solid rgba(77, 208, 225, 0.3);
-            padding: 2px 6px;
-            border-radius: 4px;
+            background: var(--primary-soft);
+            color: var(--primary-deep);
+            border: 1px solid rgba(91, 124, 250, 0.22);
+            padding: 2px 8px;
+            border-radius: 999px;
             font-size: 11px;
             font-weight: normal;
             margin-left: 6px;
-        }
-        :root[data-theme="light"] .tag {
-            background: rgba(14, 116, 144, 0.1);
-            border-color: rgba(14, 116, 144, 0.25);
         }
 
         .tip-tag {
-            background: rgba(251, 191, 36, 0.15);
-            color: var(--warning);
-            padding: 2px 6px;
-            border-radius: 4px;
+            background: var(--accent-soft);
+            color: var(--accent-deep);
+            padding: 2px 8px;
+            border-radius: 999px;
             font-size: 11px;
             font-weight: normal;
             margin-left: 6px;
-            border: 1px solid rgba(251, 191, 36, 0.3);
-        }
-        :root[data-theme="light"] .tip-tag {
-            background: rgba(217, 119, 6, 0.1);
-            border-color: rgba(217, 119, 6, 0.25);
+            border: 1px solid rgba(201, 138, 45, 0.25);
         }
 
-        .status { margin-top: 12px; font-weight: bold; font-size: 13px; color: var(--success); text-align: center; text-shadow: 0 0 8px var(--success-glow); }
+        .status { margin-top: 12px; font-weight: bold; font-size: 13px; color: var(--success); text-align: center; }
 
         .node-card {
             background: var(--node-card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 10px;
+            border-radius: 18px;
             padding: 14px 16px;
             margin-bottom: 14px;
             position: relative;
-            transition: all 0.3s;
+            box-shadow: var(--raised-sm);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
         .node-card:hover {
-            border-color: rgba(77, 208, 225, 0.4);
-            box-shadow: 0 0 15px var(--stats-bg);
+            transform: translateY(-2px);
+            box-shadow:
+                7px 7px 16px var(--sd-strong),
+                -7px -7px 16px var(--sl-strong),
+                0 0 0 1px rgba(91, 124, 250, 0.2),
+                0 0 26px rgba(91, 124, 250, 0.28),
+                0 0 56px rgba(91, 124, 250, 0.12);
         }
-        .node-card .btn-card-actions { position: absolute; right: 14px; top: 12px; display: flex; gap: 6px; }
+        .node-card .btn-card-actions { position: static; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; flex: 0 0 auto; }
 
         .node-card .btn-action {
             border: none;
-            border-radius: 6px;
-            padding: 4px 10px;
+            border-radius: 999px;
+            padding: 4px 12px;
             cursor: pointer;
             font-size: 12px;
-            color: var(--btn-text-on-primary);
-            font-weight: 500;
-            transition: all 0.2s;
+            font-weight: bold;
+            background: var(--surface);
+            box-shadow: 3px 3px 7px var(--sd-soft), -3px -3px 7px var(--sl-mid);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
         }
-        .btn-clear { background: rgba(251, 191, 36, 0.18); color: var(--warning) !important; border: 1px solid rgba(251, 191, 36, 0.4) !important; }
-        .btn-clear:hover { background: var(--warning); color: var(--btn-text-dark-on-primary) !important; }
-        .btn-remove { background: rgba(248, 113, 113, 0.18); color: var(--danger) !important; border: 1px solid rgba(248, 113, 113, 0.4) !important; }
-        .btn-remove:hover { background: var(--danger); color: var(--btn-text-on-primary) !important; }
-        .btn-lookup { background: rgba(77, 208, 225, 0.15); color: var(--primary) !important; border: 1px solid rgba(77, 208, 225, 0.4) !important; }
-        .btn-lookup:hover { background: var(--primary); color: var(--btn-text-dark-on-primary) !important; }
+        .node-card .btn-action:active { transform: translateY(1px); box-shadow: var(--inset); }
+        .btn-clear { color: var(--warning) !important; }
+        .btn-clear:hover { background: var(--warning); color: #FFFFFF !important; }
+        .btn-remove { color: var(--danger) !important; }
+        .btn-remove:hover { background: var(--danger); color: #FFFFFF !important; }
+        .btn-lookup { color: var(--primary-deep) !important; }
+        .btn-lookup:hover { background: var(--primary); color: #FFFFFF !important; }
 
         .btn-add-node {
-            background: var(--btn-add-node-bg);
-            color: var(--text-main);
-            border: 1px dashed var(--card-border);
+            background: var(--surface);
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
             padding: 10px 18px;
-            border-radius: 8px;
+            border-radius: 999px;
             cursor: pointer;
             font-size: 13px;
             font-weight: bold;
             margin-bottom: 12px;
             width: 100%;
-            transition: all 0.3s;
+            box-shadow: var(--raised-sm);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
         }
         .btn-add-node:hover {
-            background: var(--stats-bg);
-            border-color: var(--primary);
-            color: var(--primary);
+            color: var(--primary-deep);
+            transform: translateY(-2px);
+            box-shadow: 7px 7px 16px var(--sd-strong), -7px -7px 16px var(--sl-strong);
+        }
+        .btn-add-node:active {
+            transform: translateY(1px);
+            box-shadow: var(--inset);
         }
         
         .mode-section { display: none; }
         .mode-section.active-section { display: block; }
+        /* 风格切换按钮（Soft UI 胶囊） */
+        .theme-toggle {
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid var(--card-border);
+            background: var(--surface);
+            color: var(--text-main);
+            font-size: 12px;
+            font-weight: bold;
+            padding: 6px 14px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: var(--raised-sm);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
+        }
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 7px 7px 16px var(--sd-strong), -7px -7px 16px var(--sl-strong);
+            color: var(--text-strong);
+        }
+        .theme-toggle:active {
+            transform: translateY(1px);
+            box-shadow: var(--inset);
+        }
+        /* ===== 深色风格（Soft UI 暗面）：锁定态 + 自动跟随系统 ===== */
+        html[data-theme="dark"] {
+            --bg-base: #1A2030;
+            --surface: #20283A;
+            --body-gradient: linear-gradient(135deg, #242C42 0%, #171D2C 55%, #1E2434 100%);
+            --shadow-dark: rgba(6, 9, 16, 0.7);
+            --shadow-light: rgba(58, 68, 96, 0.45);
+            --raised: 8px 8px 18px rgba(6, 9, 16, 0.65), -8px -8px 18px rgba(58, 68, 96, 0.32);
+            --raised-sm: 5px 5px 12px rgba(6, 9, 16, 0.55), -5px -5px 12px rgba(58, 68, 96, 0.28);
+            --inset: inset 4px 4px 9px rgba(6, 9, 16, 0.6), inset -4px -4px 9px rgba(58, 68, 96, 0.35);
+            --sd-base: rgba(6, 9, 16, 0.6);
+            --sl-base: rgba(58, 68, 96, 0.3);
+            --sd-strong: rgba(6, 9, 16, 0.7);
+            --sl-strong: rgba(58, 68, 96, 0.38);
+            --sd-mid: rgba(6, 9, 16, 0.55);
+            --sl-mid: rgba(58, 68, 96, 0.3);
+            --sd-soft: rgba(6, 9, 16, 0.5);
+            --card-border: rgba(255, 255, 255, 0.09);
+            --header-divider: rgba(120, 135, 170, 0.28);
+            --accent-soft: rgba(232, 180, 90, 0.15);
+            --accent-shadow: rgba(91, 124, 250, 0.4);
+            --primary-soft: rgba(91, 124, 250, 0.16);
+            --secondary-soft: rgba(123, 143, 191, 0.18);
+            --text-main: #C4CEE2;
+            --text-muted: #8593B2;
+            --text-strong: #E4EAF6;
+            --focus-ring: rgba(91, 124, 250, 0.38);
+            --success: #66D9A0;
+            --success-soft: rgba(102, 217, 160, 0.14);
+            --warning: #E8B45A;
+            --warning-soft: rgba(232, 180, 90, 0.14);
+            --danger: #E57A7A;
+            --danger-soft: rgba(229, 122, 122, 0.16);
+            --mode-desc-color: #9DB4FF;
+            --mode-desc-bg: rgba(91, 124, 250, 0.12);
+            --mode-desc-border: rgba(91, 124, 250, 0.3);
+            --stats-bg: #20283A;
+            --stats-border: rgba(255, 255, 255, 0.09);
+            --output-bg: #1B2233;
+            --output-color: #B7C3DC;
+            --output-shadow: rgba(6, 9, 16, 0.55);
+            --option-bg: #232B40;
+            --card-bg: #20283A;
+            --input-bg: #1B2233;
+            --input-border: rgba(255, 255, 255, 0.12);
+            --node-card-bg: #20283A;
+            --btn-add-node-bg: #20283A;
+            --mode-btn-bg: #20283A;
+            --download-btn-bg: rgba(91, 124, 250, 0.16);
+            --btn-sub-color: #FFFFFF;
+            --quick-link-color: #FFFFFF;
+        }
+        @media (prefers-color-scheme: dark) {
+            html:not([data-theme="light"]) {
+                --bg-base: #1A2030;
+                --surface: #20283A;
+                --body-gradient: linear-gradient(135deg, #242C42 0%, #171D2C 55%, #1E2434 100%);
+                --shadow-dark: rgba(6, 9, 16, 0.7);
+                --shadow-light: rgba(58, 68, 96, 0.45);
+                --raised: 8px 8px 18px rgba(6, 9, 16, 0.65), -8px -8px 18px rgba(58, 68, 96, 0.32);
+                --raised-sm: 5px 5px 12px rgba(6, 9, 16, 0.55), -5px -5px 12px rgba(58, 68, 96, 0.28);
+                --inset: inset 4px 4px 9px rgba(6, 9, 16, 0.6), inset -4px -4px 9px rgba(58, 68, 96, 0.35);
+                --sd-base: rgba(6, 9, 16, 0.6);
+                --sl-base: rgba(58, 68, 96, 0.3);
+                --sd-strong: rgba(6, 9, 16, 0.7);
+                --sl-strong: rgba(58, 68, 96, 0.38);
+                --sd-mid: rgba(6, 9, 16, 0.55);
+                --sl-mid: rgba(58, 68, 96, 0.3);
+                --sd-soft: rgba(6, 9, 16, 0.5);
+                --card-border: rgba(255, 255, 255, 0.09);
+                --header-divider: rgba(120, 135, 170, 0.28);
+                --accent-soft: rgba(232, 180, 90, 0.15);
+                --accent-shadow: rgba(91, 124, 250, 0.4);
+                --primary-soft: rgba(91, 124, 250, 0.16);
+                --secondary-soft: rgba(123, 143, 191, 0.18);
+                --text-main: #C4CEE2;
+                --text-muted: #8593B2;
+                --text-strong: #E4EAF6;
+                --focus-ring: rgba(91, 124, 250, 0.38);
+                --success: #66D9A0;
+                --success-soft: rgba(102, 217, 160, 0.14);
+                --warning: #E8B45A;
+                --warning-soft: rgba(232, 180, 90, 0.14);
+                --danger: #E57A7A;
+                --danger-soft: rgba(229, 122, 122, 0.16);
+                --mode-desc-color: #9DB4FF;
+                --mode-desc-bg: rgba(91, 124, 250, 0.12);
+                --mode-desc-border: rgba(91, 124, 250, 0.3);
+                --stats-bg: #20283A;
+                --stats-border: rgba(255, 255, 255, 0.09);
+                --output-bg: #1B2233;
+                --output-color: #B7C3DC;
+                --output-shadow: rgba(6, 9, 16, 0.55);
+                --option-bg: #232B40;
+                --card-bg: #20283A;
+                --input-bg: #1B2233;
+                --input-border: rgba(255, 255, 255, 0.12);
+                --node-card-bg: #20283A;
+                --btn-add-node-bg: #20283A;
+                --mode-btn-bg: #20283A;
+                --download-btn-bg: rgba(91, 124, 250, 0.16);
+                --btn-sub-color: #FFFFFF;
+                --quick-link-color: #FFFFFF;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="quick-links-bar">
-        <a href="/" class="download-btn-link home-link" onclick="trackAction('首页外链：返回首页（/）'); return true;">
-            🏠 首页
-        </a>
-        <div class="quick-links-right">
-            <a href="https://leak.ozero.asia/" target="_blank" rel="noopener noreferrer" class="download-btn-link" onclick="trackAction('首页外链：DNS/WebRTC 泄露检测工具（leak.ozero.asia）'); return true;">
-                DNS/WebRTC 泄露检测
-            </a>
-            <a href="https://sub.ozero.asia/" target="_blank" rel="noopener noreferrer" class="download-btn-link" onclick="trackAction('首页外链：Subconverter 订阅转换工具（sub.ozero.asia）'); return true;">
-                Subconverter订阅转换
-            </a>
-            <a href="https://acting.ovitor.asia/" target="_blank" rel="noopener noreferrer" class="download-btn-link" onclick="trackAction('首页外链：云机场与代理加速推荐（acting.ovitor.asia）'); return true;">
-                云机场与代理加速推荐
-            </a>
-            <a href="https://github.com/Ozero-top/OpenClash-Config/tree/main/OpenClash%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6" target="_blank" rel="noopener noreferrer" class="download-btn-link" onclick="trackAction('首页外链：下载 OpenClash 插件配置文件（GitHub）'); return true;">
-                📥 下载OpenClash插件配置文件
-            </a>
-        </div>
-    </div>
-
-    <div class="header-title-container">
-        <h2>⚡ OpenClash YAML规则文件一键生成工具</h2>
-        <div class="header-right-tools">
-            <button type="button" id="themeToggleBtn" class="theme-toggle-btn" title="切换浅色/深色主题">🌙</button>
+    <div class="hero">
+        <h2><img src="https://raw.githubusercontent.com/vernesong/OpenClash/dev/img/logo.png" alt="OpenClash" class="hero-logo"> OpenClash(.yaml)规则文件一键生成工具</h2>
+        <div class="hero-tools">
             <div class="ip-stats-badge" id="ipStatsBadge">
-                🌐 当前访问IP: <strong id="userIp" class="ip-masked" title="点击显示完整 IP（默认打码隐藏后半部分）">加载中...</strong> | 👁️ 累计访客数: <strong id="visitCount">...</strong>
+                🗺️ 当前访问IP: <strong id="userIp" class="ip-masked" title="点击显示完整 IP（默认打码隐藏后半部分）">加载中...</strong> | 🧑‍💼 累计访客数: <strong id="visitCount">...</strong> | 🟢 实时在线: <strong id="onlineCount">...</strong>
             </div>
-            <a href="https://github.com/Ozero-top/OpenClash-Online-YAML-Generator" target="_blank" rel="noopener noreferrer" class="github-link" title="访问 GitHub 开源项目" onclick="trackAction('首页外链：访问 GitHub 开源项目主页（OpenClash 在线 YAML 生成器）'); return true;">
+            <a href="https://github.com/Ozero-top/OpenClash-Online-YAML-Generator" target="_blank" rel="noopener noreferrer" class="github-link" title="访问 GitHub 开源项目">
                 <svg height="24" width="24" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
                 </svg>
             </a>
+            <span class="hero-sub">🌿 .yaml 规则版本 V.0.2.7</span>
+            <button type="button" id="themeToggle" class="theme-toggle" aria-label="切换深浅风格">🌗 自动</button>
         </div>
     </div>
 
-    <div class="section-header-box">
-        <div class="section-title">生成模式与实用工具选择</div>
+    <div class="quick-links-bar">
+        <a href="/" class="download-btn-link home-link">
+            🏠 首页
+        </a>
+        <div class="quick-links-right">
+            <a href="https://test.ovitor.asia/" target="_blank" rel="noopener noreferrer" class="download-btn-link">
+                规则生成工具(测试版)
+            </a>
+            <a href="https://leak.ozero.asia/" target="_blank" rel="noopener noreferrer" class="download-btn-link">
+                DNS/WebRTC 泄露检测
+            </a>
+            <a href="https://sub.ozero.asia/" target="_blank" rel="noopener noreferrer" class="download-btn-link">
+                Subconverter订阅转换
+            </a>
+            <a href="https://acting.ovitor.asia/" target="_blank" rel="noopener noreferrer" class="download-btn-link">
+                云机场与代理加速推荐
+            </a>
+            <a href="https://github.com/Ozero-top/OpenClash-Config/tree/main/OpenClash%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6" target="_blank" rel="noopener noreferrer" class="download-btn-link">
+                📥 下载Clash插件配置文件
+            </a>
+        </div>
     </div>
-    <div class="mode-btn-group">
-        <button id="btn-mode-chain-single" class="mode-btn active" onclick="switchMode('chain-single')">🔲 链式代理 - 独立节点</button>
-        <button id="btn-mode-chain-bulk" class="mode-btn" onclick="switchMode('chain-bulk')">📑 链式代理 - 批量粘贴</button>
-        <button id="btn-mode-standard" class="mode-btn" onclick="switchMode('standard')">🌐 自动分流 - 家用模式</button>
-        <button id="btn-mode-direct" class="mode-btn" onclick="switchMode('direct')">🎯 直连模式 - 电商/游戏</button>
-        <button id="btn-mode-sk-convert" class="mode-btn" onclick="switchMode('sk-convert')">🛠️ Socks5 / SK 格式转换</button>
+
+    <div class="step-card">
+        <div class="step-title"><span class="step-badge">1</span>选择生成模式</div>
+        <div class="mode-btn-group">
+        <button id="btn-mode-chain-single" class="mode-btn active" onclick="switchMode('chain-single')">⛓️ 链式代理 - 独立节点</button>
+        <button id="btn-mode-chain-bulk" class="mode-btn" onclick="switchMode('chain-bulk')">🧮 链式代理 - 批量粘贴</button>
+        <button id="btn-mode-standard" class="mode-btn" onclick="switchMode('standard')">🖥️ 自动分流 - 家用模式</button>
+        <button id="btn-mode-direct" class="mode-btn" onclick="switchMode('direct')">🧲 直连模式 - 电商/游戏</button>
+        <button id="btn-mode-sk-convert" class="mode-btn" onclick="switchMode('sk-convert')">⏭️ Socks5 格式转换</button>
     </div>
 
     <div id="modeDescBox" class="mode-desc-box"></div>
-    
+    </div>
+
+    <div class="step-card">
+        <div class="step-title"><span class="step-badge">2</span>填写订阅与节点配置</div>
     <div id="chainConfigSection">
         <div id="chainSubSection">
-        <div class="section-title" style="margin-top:20px; margin-bottom:8px;">1. 前置中转代理订阅配置</div>
+        <div class="section-title" style="margin-top:20px; margin-bottom:8px;">1. 前置中转机场订阅配置</div>
         <div class="row">
             <div style="flex: 1;">
-                <label for="chainSubName">代理商自定义名称:</label>
-                <input type="text" id="chainSubName" value="代理服务商名称" placeholder="自定义名称（默认：中转代理）">
+                <label for="chainSubName">自定义机场名称:</label>
+                <input type="text" id="chainSubName" value="机场名称" placeholder="自定义名称（默认：中转代理）">
             </div>
             <div style="flex: 2;">
-                <label for="subUrl">中转代理订阅地址 (url):</label>
+                <label for="subUrl">机场订阅地址(中转) (url):</label>
                 <input type="text" id="subUrl" value="https://your-sub-domain.com/link/token">
             </div>
         </div>
@@ -1871,28 +1955,28 @@ function trackAction(actionName, extra) { /* no-op */ }
         <div class="section-title" style="margin-top:20px; margin-bottom:8px;">🌐 自动分流代理订阅配置 </div>
         <div class="row">
             <div style="flex: 1;">
-                <label for="stdSubName1">代理商自定义名称:</label>
-                <input type="text" id="stdSubName1" value="代理服务商名称" placeholder="自定义名称（默认：主力代理）">
+                <label for="stdSubName1">自定义机场名称:</label>
+                <input type="text" id="stdSubName1" value="主力机场" placeholder="自定义名称（默认：主力机场）">
             </div>
             <div style="flex: 2;">
-                <label for="stdSubUrl1">主力代理订阅地址 (url):</label>
+                <label for="stdSubUrl1">主力机场订阅地址 (url):</label>
                 <input type="text" id="stdSubUrl1" value="https://your-main-sub-domain.com/link/token">
             </div>
         </div>
         <div class="row" style="margin-top: 10px;">
             <div>
                 <label>
-                    <input type="checkbox" id="enableBackupSub" onchange="toggleBackupSubInput()"> 启用备用代理聚合 (双订阅链接地址模式)
+                    <input type="checkbox" id="enableBackupSub" onchange="toggleBackupSubInput()"> 启用备用机场 (双机场订阅链接聚合模式)
                 </label>
             </div>
         </div>
         <div class="row" id="backupSubRow" style="display: none; margin-top: 8px;">
             <div style="flex: 1;">
-                <label for="stdSubName2">备用代理自定义名称:</label>
-                <input type="text" id="stdSubName2" value="备用代理" placeholder="自定义名称（默认：备用代理）">
+                <label for="stdSubName2">备用机场自定义名称:</label>
+                <input type="text" id="stdSubName2" value="备用机场" placeholder="自定义名称（默认：备用机场）">
             </div>
             <div style="flex: 2;">
-                <label for="stdSubUrl2">备用代理订阅地址 (url):</label>
+                <label for="stdSubUrl2">备用机场订阅地址 (url):</label>
                 <input type="text" id="stdSubUrl2" value="https://your-backup-sub-domain.com/link/token">
             </div>
         </div>
@@ -1902,7 +1986,7 @@ function trackAction(actionName, extra) { /* no-op */ }
         <div class="section-title" style="margin-top:20px; margin-bottom:8px;">🛠️ IP|端口|账号|密码 批量转 Socks5 链接</div>
         <div style="margin-bottom: 12px;">
             <label for="skInputData">输入原始数据（格式：IP|端口|账号|密码 或 域名|端口|账号|密码）：</label>
-            <textarea id="skInputData" rows="6" placeholder="示例格式：&#10;sk.admin.com|10002|aaBBcc|12345678abcdefg&#10;192.168.1.100|1080|user1|pass123"></textarea>
+            <textarea id="skInputData" rows="6" placeholder="示例格式：&#10;一行一条！按照 IP|端口|账号|密码 格式顺序填入后转换为标准的 socks5:// 协议链接&#10;sk.admin.com|10002|aaBBcc|12345678abcdefg&#10;192.168.1.100|1080|user1|pass123"></textarea>
         </div>
 
         <div class="btn-group" style="margin-top: 10px; margin-bottom: 15px;">
@@ -1920,22 +2004,25 @@ function trackAction(actionName, extra) { /* no-op */ }
         </div>
     </div>
 
+    </div>
+
+    <div class="step-card">
+        <div class="step-title"><span class="step-badge">3</span>生成并下载规则文件</div>
     <div class="btn-group" id="clashBtnGroup">
-        <button class="btn-main" onclick="generateYaml(true)">🚀 生成并自动下载完整YAML规则文件</button>
-        <button class="btn-refresh" onclick="reloadPage()">🔄 刷新网页重置</button>
-        <button class="btn-sub" onclick="downloadYaml()">💾 直接另存为 config.yaml</button>
+        <button class="btn-main" onclick="generateYaml(true)">🚀 生成并下载.yaml文件</button>
+        <button class="btn-refresh" onclick="reloadPage()">🔄 重置所有信息</button>
+        <button class="btn-sub" onclick="downloadYaml()">💾 另存为.yaml规则文件</button>
     </div>
 
     <div id="statusMsg" class="status"></div>
 
     <div id="clashOutputSection">
-        <div class="section-title" style="margin-top:20px; margin-bottom:8px;">📄 完整 YAML 规则预览区</div>
+        <div class="section-title" style="margin-top:20px; margin-bottom:8px;">📄 完整 YAML 预览区</div>
         <div id="out-full" class="output-box">点击生成按钮后查看...</div>
+    </div>
     </div>
 </div>
 
-${SHARED_THEME_INIT_SCRIPT}
-${SHARED_TRACK_SCRIPT}
 <script>
 let lastGeneratedYaml = "";
 let nodeCount = 0;
@@ -1963,7 +2050,7 @@ const YAML_DNS_BLOCK = \`dns:
   ipv6: false
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
-  respect-rules: false
+  respect-rules: false 
   fake-ip-filter-mode: blacklist
   fake-ip-filter:
     - +.lan
@@ -2004,10 +2091,11 @@ const YAML_DNS_BLOCK = \`dns:
   proxy-server-nameserver:
     - 223.5.5.5
     - 119.29.29.29
-    
+
   nameserver:
     - 223.5.5.5
     - 119.29.29.29
+    
   fallback:
     - https://dns.google/dns-query
     - https://1.1.1.1/dns-query\`;
@@ -2030,10 +2118,10 @@ const guideLinkHtml = \`<a href="\${guideUrl}" target="_blank" rel="noopener nor
 
 const modeDescriptions = {
     'chain-single': \`🔲 链式代理 - 独立节点输入模式：允许用户通过独立的表单卡片逐个输入或粘贴前置中转代理节点，支持为每个节点单独指定或自动识别国家/地区标签，并结合网段或指定单 IP 进行精准分流。&#10;⚠️ 注意：clash运行该yaml文件后，无需任何设置即可按照前面 网段匹配 或 指定设备单 IP 配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的 所有 - 手动 选择延时最低节点作为前置中转；其他策略组对 网段匹配 或 指定设备单 IP 无任何影响；仅作用于 OpenWRT软路由 非 网段匹配 或 指定设备单 IP 的设备；可自动分流，WebRTC/DNS防泄漏 （分流/防泄漏前提要自行配置clash插件 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明 )\`,
-    'chain-bulk': \`📑 链式代理 - 批量混合粘贴模式：支持在多行文本框中批量粘贴多种协议的节点链接（如 vless、vmess、trojan、hysteria2、socks5），系统会自动解析并批量匹配国家/地区，快速生成链式代理配置文件。&#10;⚠️ 注意：clash运行该yaml规则文件后，无需任何设置即可按照前面 网段匹配 或 指定设备单 IP 配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的 所有 - 手动 选择延时最低节点作为前置中转；其他策略组对 网段匹配 或 指定设备单 IP 无任何影响；仅作用于 OpenWRT软路由 非 网段匹配 或 指定设备单 IP 的设备；可自动分流，WebRTC/DNS防泄漏 （分流/防泄漏前提要自行配置clash插件 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明 )\`,
-    'standard': \`🌐 自动分流 - 单/双代理订阅家用模式 (V0.2.5)：面向日常或家用场景，支持配置单代理或双代理（主力+备用）订阅地址，自动聚合节点并提供全自动区域流控、延迟优化与丰富的主流分流规则。同时兼顾DNS防泄漏和WebRTC防泄漏。&#10;⚠️ 注意：clash运行该yaml规则文件后，可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组，根据使用需求自行设置；除 直连、拒绝 策略组，其他策略组均是自动切换最低延时节点；可手动选择，但会在3-6小时后自动切换到延时最低节点。【分流/防泄漏前提要自行配置clash插件】 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明\`,
-    'sk-convert': '🛠️ Socks5 / SK 格式转换工具：提供独立的格式批量转换服务，将"IP|端口|账号|密码"格式转换为标准的 socks5:// 协议链接。转换结果可直接复制，用于链式代理或其他代理软件。',
-    'direct': \`🎯 直连模式 - 网段/单IP精准分流 (无中转/无链式)：<span class="highlight-badge">此模式适合: 国内外电商/游戏/直播使用</span> 仅需要输入节点链接并选择网段匹配或指定设备单 IP，系统自动生成 YAML 配置文件。不需要前置中转代理订阅，也不使用链式代理 (dialer-proxy)，节点直接作为代理出口，配合 SRC-IP-CIDR 规则实现指定网段或设备的精准分流。&#10;⚠️ 注意：clash运行该yaml规则文件后，无需任何设置即可按照 网段匹配 或 指定设备单 IP 配置自动运行（默认全局）\`
+    'chain-bulk': \`📑 链式代理 - 批量混合粘贴模式：支持在多行文本框中批量粘贴多种协议的节点链接（如 vless、vmess、trojan、hysteria2、socks5），系统会自动解析并批量匹配国家/地区，快速生成链式代理配置文件。&#10;⚠️ 注意：clash运行该yaml文件后，无需任何设置即可按照前面 网段匹配 或 指定设备单 IP 配置自动运行（默认全局），可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组的 所有 - 手动 选择延时最低节点作为前置中转；其他策略组对 网段匹配 或 指定设备单 IP 无任何影响；仅作用于 OpenWRT软路由 非 网段匹配 或 指定设备单 IP 的设备；可自动分流，WebRTC/DNS防泄漏 （分流/防泄漏前提要自行配置clash插件 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明 )\`,
+    'standard': \`🌐 自动分流 - 单/双代理订阅家用模式 (V.0.2.7)：面向日常或家用场景，支持配置单代理或双代理（主力+备用）订阅地址，自动聚合节点并提供全自动区域流控、延迟优化与丰富的主流分流规则。同时兼顾DNS防泄漏和WebRTC防泄漏。&#10;⚠️ 注意：clash运行该yaml文件后，可在 Clash 的 [控制面板] 打开 [ZashBoard] 找到策略组，根据使用需求自行设置；除 直连、拒绝 策略组，其他策略组均是自动切换最低延时节点；可手动选择，但会在3-6小时后自动切换到延时最低节点。【分流/防泄漏前提要自行配置clash插件】 或 【页面右上方下载 clash插件配置文件 替换】，具体操作可参考：\${guideLinkHtml} - 【替换OpenClash插件配置文件】 操作说明\`,
+    'sk-convert': '🛠️ Socks5 格式转换工具：提供独立的格式批量转换服务，按照"IP|端口|账号|密码"格式顺序填入后转换为标准的 socks5:// 协议链接。转换结果可直接复制，用于链式代理或其他代理软件。',
+    'direct': \`🎯 直连模式 - 网段/单IP精准分流 (⚠️ 注意：无中转/无链式/无分流/无规则 ⚠️)：<span class="highlight-badge">此模式适合: 国内外电商/游戏/直播直连节点</span> 仅需要输入节点链接并选择网段匹配或指定设备单 IP，系统自动生成 YAML 配置文件。不需要前置中转代理订阅，也不使用链式代理 (dialer-proxy)，节点直接作为代理出口，配合 SRC-IP-CIDR 规则实现指定网段或设备的精准分流。&#10;⚠️ 注意：clash运行该yaml文件后，无需任何设置即可按照 网段匹配 或 指定设备单 IP 配置自动运行（默认全局）\`
 };
 
 const countryCodeToCn = {
@@ -2254,9 +2342,6 @@ const commonCountries = [
         if (!_fullIp || _fullIp === "未知") return;
         _revealed = !_revealed;
         _applyDisplay();
-        try {
-            trackAction(_revealed ? "工具交互：显示完整访问 IP（取消打码）" : "工具交互：隐藏访问 IP（恢复打码）");
-        } catch (_) {}
     };
 
     function _applyDisplay() {
@@ -2317,17 +2402,82 @@ async function loadVisitorStats() {
             window.setVisitorIp(data.ip || '未知');
             if (data.kvBound) {
                 document.getElementById('visitCount').innerText = data.visitCount;
+                const onlineEl = document.getElementById('onlineCount');
+                if (onlineEl) onlineEl.innerText = (typeof data.onlineCount === 'number') ? data.onlineCount : '-';
             } else {
                 document.getElementById('visitCount').innerText = '未绑定KV';
                 document.getElementById('visitCount').title = '在 Worker 设置中绑定 PAGE_VISITS KV 命名空间即可开启计数';
+                const onlineEl = document.getElementById('onlineCount');
+                if (onlineEl) onlineEl.innerText = '-';
             }
         }
     } catch (e) {
         console.warn('获取访问统计失败:', e);
         window.setVisitorIp('未知');
         document.getElementById('visitCount').innerText = '未获取';
+        const onlineEl = document.getElementById('onlineCount');
+        if (onlineEl) onlineEl.innerText = '-';
     }
 }
+// 每 60 秒轮询刷新实时在线人数（复用 /api/visit，独立访客计数有 30 天去重，不会虚增）
+setInterval(loadVisitorStats, 60000);
+
+// ===== 深浅风格切换：三态循环（自动跟随系统 → 锁定深色 → 锁定浅色 → 自动） =====
+(function () {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    var mq = (typeof window.matchMedia === 'function') ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+    function stored() {
+        try {
+            var t = localStorage.getItem('theme');
+            return (t === 'dark' || t === 'light') ? t : '';
+        } catch (e) { return ''; }
+    }
+    function effTheme() {
+        var t = stored();
+        if (t) return t;
+        return (mq && mq.matches) ? 'dark' : 'light';
+    }
+    function syncMeta(t) {
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (!m) return;
+        var eff = t || effTheme();
+        m.setAttribute('content', eff === 'dark' ? '#171D2C' : '#E9EEF5');
+    }
+    function applyTheme(t) {
+        if (t) {
+            document.documentElement.setAttribute('data-theme', t);
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+        syncMeta(t);
+    }
+    function renderBtn() {
+        var t = stored();
+        var label = t === 'dark' ? '🌙 深色' : (t === 'light' ? '☀️ 浅色' : '🌗 自动');
+        btn.textContent = label;
+        var cur = t === 'dark' ? '深色' : (t === 'light' ? '浅色' : '自动跟随系统（现为' + (effTheme() === 'dark' ? '深色' : '浅色') + '）');
+        btn.title = '当前：' + cur + '，点击切换风格';
+    }
+    btn.addEventListener('click', function () {
+        var t = stored();
+        var next = t === 'dark' ? 'light' : (t === 'light' ? '' : 'dark');
+        try {
+            if (next) { localStorage.setItem('theme', next); } else { localStorage.removeItem('theme'); }
+        } catch (e2) {}
+        applyTheme(next);
+        renderBtn();
+    });
+    var onSysChange = function () {
+        if (!stored()) { applyTheme(''); }
+        renderBtn();
+    };
+    if (mq) {
+        if (mq.addEventListener) { mq.addEventListener('change', onSysChange); }
+        else if (mq.addListener) { mq.addListener(onSysChange); }
+    }
+    renderBtn();
+})();
 
 function isIPv4(str) {
     return /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(str);
@@ -3020,19 +3170,10 @@ async function resolveCountryFromLink(link) {
 }
 
 function reloadPage() {
-    trackAction("主页：刷新页面（重载）");
     window.location.reload();
 }
 
 function switchMode(mode) {
-    const modeNames = {
-        'chain-single': '链式代理 - 独立节点输入模式',
-        'chain-bulk':  '链式代理 - 批量混合粘贴模式',
-        'standard':    '自动分流 - 单/双代理订阅家用模式',
-        'direct':      '直连模式 - 网段/单IP精准分流（无中转/无链式）',
-        'sk-convert':  'Socks5 / SK 格式转换工具'
-    };
-    trackAction("主页：切换功能模式", modeNames[mode] || mode);
     currentMode = mode;
     const chainConfigSection = document.getElementById('chainConfigSection');
     const standardConfigSection = document.getElementById('standardConfigSection');
@@ -3118,7 +3259,6 @@ function switchMode(mode) {
 }
 
 function convertSkFormat() {
-    trackAction("SK转换工具：执行格式转换（IP|端口|账号|密码 → socks5://）");
     const input = document.getElementById('skInputData').value.trim();
     if (!input) {
         alert('请输入需要转换的数据！');
@@ -3150,13 +3290,11 @@ function convertSkFormat() {
 }
 
 function clearSkText() {
-    trackAction("SK转换工具：清空输入与转换结果");
     document.getElementById('skInputData').value = '';
     document.getElementById('skOutputData').value = '';
 }
 
 function copySkOutput() {
-    trackAction("SK转换工具：复制转换结果到剪贴板");
     const outputText = document.getElementById('skOutputData').value.trim();
     if (!outputText) {
         alert('暂无可复制的转换结果！');
@@ -3174,13 +3312,11 @@ function copySkOutput() {
 
 function toggleBackupSubInput() {
     const isChecked = document.getElementById('enableBackupSub').checked;
-    trackAction("自动分流模式：切换备用订阅显示", isChecked ? "展开备用订阅输入框" : "收起备用订阅输入框");
     document.getElementById('backupSubRow').style.display = isChecked ? 'flex' : 'none';
 }
 
 function toggleIpInputs() {
     const targetType = document.getElementById('ruleTargetType').value;
-    trackAction("链式代理：分流目标切换", targetType === 'singleIp' ? "切换为按指定设备单 IP 分流" : "切换为按网段匹配分流");
     const subnetBlock1 = document.getElementById('subnetBlock1');
     const subnetBlock2 = document.getElementById('subnetBlock2');
     const singleIpBlock1 = document.getElementById('singleIpBlock1');
@@ -3200,7 +3336,6 @@ function toggleIpInputs() {
 }
 
 function addNodeCard(defaultLink = "") {
-    trackAction("链式代理-独立节点：新增节点输入卡片");
     nodeCount++;
     const container = document.getElementById('nodesContainer');
     const card = document.createElement('div');
@@ -3213,18 +3348,22 @@ function addNodeCard(defaultLink = "") {
     });
 
     card.innerHTML = \`
-        <div class="btn-card-actions">
-            <button class="btn-action btn-lookup" onclick="manualLookupCard(\${nodeCount})">🔍 联网查询</button>
-            <button class="btn-action btn-clear" onclick="clearNodeText('node-link-\${nodeCount}', 'node-country-\${nodeCount}', \${nodeCount})">🧹 清空</button>
-            <button class="btn-action btn-remove" onclick="removeNodeCard('node-card-\${nodeCount}')">✕ 删除</button>
+        <div class="row" style="margin-bottom: 8px; gap: 8px;">
+            <div style="flex: 1;">
+                <label>国家 / 地区标签 <span class="tag" id="node-tag-\${nodeCount}">🤖 自动识别</span><span class="tip-tag">⌨️ 可手动输入地区名称，或下拉选择预设</span>:</label>
+            </div>
+            <div class="btn-card-actions">
+                <button class="btn-action btn-lookup" onclick="manualLookupCard(\${nodeCount})">🔍 联网查询</button>
+                <button class="btn-action btn-clear" onclick="clearNodeText('node-link-\${nodeCount}', 'node-country-\${nodeCount}', \${nodeCount})">🧹 清空</button>
+                <button class="btn-action btn-remove" onclick="removeNodeCard('node-card-\${nodeCount}')">✕ 删除</button>
+            </div>
         </div>
         <div class="row" style="margin-bottom: 8px;">
             <div style="flex: 1;">
-                <label>国家 / 地区标签 <span class="tag" id="node-tag-\${nodeCount}">🤖 自动识别</span><span class="tip-tag">⌨️ 下拉选择预设，或选"✎ 自定义"直接输入</span>:</label>
                 <div class="country-wrap" id="country-wrap-\${nodeCount}">
                     <select id="node-country-\${nodeCount}" class="node-country" onchange="countrySelChanged(\${nodeCount})" style="flex:1;">
+                        <option value="__custom__">✎ 手动输入地区名称</option>
                         \${optionsHtml}
-                        <option value="__custom__">✎ 自定义输入...</option>
                     </select>
                     <span class="country-custom" id="country-custom-\${nodeCount}" style="display:none; flex:1;">
                         <input type="text" id="node-country-in-\${nodeCount}" class="country-in" oninput="countryInputChanged(\${nodeCount})" onblur="commitCustomCountry(\${nodeCount})" placeholder="输入自定义国家/地区名称..." style="flex:1;" autocomplete="off" />
@@ -3294,8 +3433,8 @@ function commitCustomCountry(id) {
     if (!exists) {
         var opt = document.createElement('option');
         opt.value = val; opt.textContent = val;
-        // 插入到"✎ 自定义..."之前（即倒数第 1 个位置之前）
-        sel.insertBefore(opt, sel.options[sel.options.length - 1]);
+        // 追加到预设列表末尾（"✎ 手动输入地区名称"固定在最前）
+        sel.appendChild(opt);
     }
     sel.value = val;
     countryBackToSel(id, val);
@@ -3339,8 +3478,8 @@ async function updateCardCountry(textarea, id) {
                 var newOpt = document.createElement('option');
                 newOpt.value = res;
                 newOpt.text = res;
-                // 插入到"✎ 自定义..."之前（即最后一个 option 之前）
-                countrySelect.insertBefore(newOpt, countrySelect.options[countrySelect.options.length - 1]);
+                // 追加到预设列表末尾（"✎ 手动输入地区名称"固定在最前）
+                countrySelect.appendChild(newOpt);
             }
             countrySelect.value = res;
         }
@@ -3358,7 +3497,6 @@ async function updateCardCountry(textarea, id) {
 }
 
 async function manualLookupCard(id) {
-    trackAction("链式代理-独立节点：手动联网查询节点国家/地区");
     const textarea = document.getElementById(\`node-link-\${id}\`);
     const countrySelect = document.getElementById(\`node-country-\${id}\`);
     if (countrySelect) delete countrySelect.dataset.userEdited;
@@ -3366,13 +3504,11 @@ async function manualLookupCard(id) {
 }
 
 function removeNodeCard(id) {
-    trackAction("链式代理-独立节点：删除节点卡片");
     const card = document.getElementById(id);
     if (card) card.remove();
 }
 
 function clearNodeText(textareaId, countryInputId, id) {
-    trackAction("链式代理-独立节点：清空单节点输入内容");
     const el = document.getElementById(textareaId);
     if (el) el.value = "";
     const cel = document.getElementById(countryInputId);
@@ -3385,7 +3521,6 @@ function clearNodeText(textareaId, countryInputId, id) {
 }
 
 function clearBulkText() {
-    trackAction("链式代理-批量粘贴：清空批量节点文本框");
     document.getElementById('bulkLinks').value = "";
 }
 
@@ -3499,14 +3634,22 @@ function formatInlineYaml(obj) {
     return \`{\${parts.join(', ')}}\`;
 }
 
+// 清理用户输入：去除 YAML 禁止的控制字符（C0/C1 控制符、DEL、零宽字符、BOM）以及引号/反斜杠
+// 防止粘贴订阅链接/名称时混入的不可见字符导致 go-yaml 报 "control characters are not allowed"
+const sanitizeYamlInput = (s) => String(s)
+    .replace(/[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F\\uFEFF\\u200B-\\u200D]/g, '')
+    .replace(/["\\\\]/g, '');
+
 async function downloadYaml() {
-    trackAction("主页：下载已生成的 OpenClash YAML 配置文件（保存到本地）");
     if (!lastGeneratedYaml) {
         alert("请先点击生成配置文件！");
         return;
     }
 
-    const defaultFilename = 'config.yaml';
+    // 兜底清理：移除 YAML 禁止的控制字符（保留制表符、换行与回车），确保任何模式下下载的文件均可被 go-yaml 解析
+    const yamlContent = lastGeneratedYaml.replace(/[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F\\uFEFF]/g, '');
+
+    const defaultFilename = 'OpenClash-Sub-Config.yaml';
 
     if ('showSaveFilePicker' in window) {
         try {
@@ -3518,7 +3661,7 @@ async function downloadYaml() {
                 }],
             });
             const writable = await handle.createWritable();
-            await writable.write(lastGeneratedYaml);
+            await writable.write(yamlContent);
             await writable.close();
             return;
         } catch (err) {
@@ -3529,7 +3672,7 @@ async function downloadYaml() {
         }
     }
 
-    const blob = new Blob([lastGeneratedYaml], { type: 'text/yaml;charset=utf-8;' });
+    const blob = new Blob([yamlContent], { type: 'text/yaml;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = defaultFilename;
@@ -3540,11 +3683,6 @@ async function downloadYaml() {
 }
 
 async function generateYaml(autoDownload = false) {
-    if (autoDownload) {
-        trackAction("主页：生成并自动下载 OpenClash YAML 配置文件（完整文件）", "当前模式: " + currentMode);
-    } else {
-        trackAction("主页：生成并在页面内预览 OpenClash YAML 配置", "当前模式: " + currentMode);
-    }
     const statusMsg = document.getElementById('statusMsg');
     statusMsg.innerText = "⏳ 正在生成配置文件，请稍等...";
 
@@ -3565,17 +3703,17 @@ async function generateYaml(autoDownload = false) {
     const clashSecret = generateRandomSecret(28);
 
     if (currentMode === 'standard') {
-        const subName1 = document.getElementById('stdSubName1').value.trim() || '主力代理';
-        const subUrl1 = document.getElementById('stdSubUrl1').value.trim() || 'https://your-main-sub-domain.com/link/token';
+        const subName1 = sanitizeYamlInput(document.getElementById('stdSubName1').value.trim()) || '主力代理';
+        const subUrl1 = sanitizeYamlInput(document.getElementById('stdSubUrl1').value.trim()) || 'https://your-main-sub-domain.com/link/token';
         const enableBackup = document.getElementById('enableBackupSub').checked;
-        const subName2 = document.getElementById('stdSubName2').value.trim() || '备用代理';
-        const subUrl2 = document.getElementById('stdSubUrl2').value.trim() || 'https://your-backup-sub-domain.com/link/token';
+        const subName2 = sanitizeYamlInput(document.getElementById('stdSubName2').value.trim()) || '备用代理';
+        const subUrl2 = sanitizeYamlInput(document.getElementById('stdSubUrl2').value.trim()) || 'https://your-backup-sub-domain.com/link/token';
 
         let proxyProvidersBlock = \`  \${subName1}:
     url: "\${subUrl1}"
     type: http
     interval: 86400
-    exclude-filter: 流量|账号|剩余|到期|过期|测试|试用|TG|群|官网|Expire|APP|官方|异常|邮箱|防|卸载|@|距离     
+    exclude-filter: 流量|账号|剩余|到期|过期|测试|试用|TG|群|官网|Expire|APP|官方|异常|邮箱|防|卸载|@|距离|DIRECT|直接连接|邀请|返利|循环|客服|网站|网址|获取|订阅|下次|版本|官址|备用|已用|联系|工单|贩卖|倒卖|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|GB     
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
@@ -3591,7 +3729,7 @@ async function generateYaml(autoDownload = false) {
     url: "\${subUrl2}"
     type: http
     interval: 86400
-    exclude-filter: 流量|账号|剩余|到期|过期|测试|试用|TG|群|官网|Expire|APP|官方|异常|邮箱|防|卸载|@|距离     
+    exclude-filter: 流量|账号|剩余|到期|过期|测试|试用|TG|群|官网|Expire|APP|官方|异常|邮箱|防|卸载|@|距离|DIRECT|直接连接|邀请|返利|循环|客服|网站|网址|获取|订阅|下次|版本|官址|备用|已用|联系|工单|贩卖|倒卖|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|GB     
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
@@ -3604,9 +3742,14 @@ async function generateYaml(autoDownload = false) {
 
         lastGeneratedYaml = 
 \`# ====================================================================
-# 配置名称：OpenClash 区域全自动流控与延迟优化 (\${enableBackup ? '双代理融合版' : '单代理标准版'})
-# 版本号：V0.2.5 (生产环境推荐版)
+# 配置名称：OpenClash 区域全自动流控/DNS防泄漏/WebRTC防泄漏/延迟优化 (\${enableBackup ? '双机场主备融合版' : '单机场标准版'})
+# 版本号：V.0.2.7 (通用规则分流版 更新日期：2026.09.01)
 # 内核要求：Mihomo (Meta) Kernel 专属
+# 027版本优化：
+#   1. 关闭 respect-rules 彻底恢复 Fake-IP 秒开极速体验
+#   2. 全局启用 lazy 懒加载与长间隔测速，显著降低 CPU 占用与带宽抢占
+#   3. 精简高效 DNS 架构，杜绝 DNS 污染与死循环解析
+#   4. 彻底关闭 ipv6: false
 # ====================================================================
 
 \${buildYamlBase(clashSecret)}
@@ -4066,7 +4209,7 @@ rule-providers:
   BiliBili / Domain: {<<: *domain, url: "https://fastly.jsdelivr.net/gh/metacubex/meta-rules-dat@meta/geo/geosite/bilibili.mrs"}\`;
 
         document.getElementById('out-full').innerText = lastGeneratedYaml;
-        statusMsg.innerText = '✅ V0.2.5 标准分流配置文件已生成！';
+        statusMsg.innerText = '✅ V.0.2.7 标准分流配置文件已生成！';
 
         if (autoDownload) {
             await downloadYaml();
@@ -4194,10 +4337,10 @@ rule-providers:
             // ================================
             lastGeneratedYaml = 
 \`# ====================================================================
-# 配置名称：OpenClash 直连模式 - 网段/单IP精准分流版
+# 配置名称：OpenClash 直连模式 - 网段/单IP精准分流版 V1.0.1
 # 内核要求：Mihomo (Meta) Kernel 专属
 # 架构方案：节点直连 + 指定设备IP/网段精准分流 + 防泄漏（无中转/无链式/无策略组分流）
-# 说明：无订阅源 → 无聚合节点 → 域名级分流已失效，仅保留 SRC-IP-CIDR 源地址分流
+# 说明：无订阅源 → 无聚合节点 → 域名级分流已失效，仅保留 SRC-IP-CIDR 源地址分流与部分娱乐/通讯/银行APP平台国内网络直连规则
 # ====================================================================
 
 \${buildYamlBase(clashSecret)}
@@ -4305,7 +4448,13 @@ rules:
 \`# ====================================================================
 # 配置名称：OpenClash 多设备/网段精准分流版
 # 内核要求：Mihomo (Meta) Kernel 专属
+# 版本号：V.0.2.7 (更新日期：2026.09.01)
 # 架构方案：代理中转 + 独享住宅IP落地 + 指定设备IP/网段精准分流 + 防泄漏
+# 027版本优化：
+#   1. 关闭 respect-rules 彻底恢复 Fake-IP 秒开极速体验
+#   2. 全局启用 lazy 懒加载与长间隔测速，显著降低 CPU 占用与带宽抢占
+#   3. 精简高效 DNS 架构，杜绝 DNS 污染与死循环解析
+#   4. 彻底关闭 ipv6: false
 # ====================================================================
 
 \${buildYamlBase(clashSecret)}
@@ -4315,7 +4464,7 @@ proxy-providers:
     url: "\${subUrl}"
     type: http
     interval: 86400
-    exclude-filter: 流量|账号|剩余|到期|过期|测试|试用|TG|群|官网|Expire|APP|官方|异常|邮箱|防|卸载|@|距离     
+    exclude-filter: 流量|账号|剩余|到期|过期|测试|试用|TG|群|官网|Expire|APP|官方|异常|邮箱|防|卸载|@|距离|DIRECT|直接连接|邀请|返利|循环|客服|网站|网址|获取|订阅|下次|版本|官址|备用|已用|联系|工单|贩卖|倒卖|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|GB     
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
